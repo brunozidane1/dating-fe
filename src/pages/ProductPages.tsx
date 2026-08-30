@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { ArrowLeft, BadgeCheck, Ban, Bell, Bike, BookOpen, Briefcase, Camera, Check, ChevronLeft, CircleCheck, Clock, Clapperboard, Coffee, Cpu, Dumbbell, Eye, Filter, Flame, Flower2, Footprints, Gamepad2, Heart, HeartPulse, ImagePlus, Info, Lock, MapPin, MessageCircle, Mountain, Music, Palette, Paperclip, Plane, Plus, Search, Send, Settings, Shield, ShieldCheck, SlidersHorizontal, Smile, Sparkles, Star, UtensilsCrossed, UserCheck, UserPlus, UserRound, UsersRound, Video, Wine, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -31,19 +31,22 @@ export function DiscoverPage() {
     .sort((a, b) => b.matchScore.overall - a.matchScore.overall)
   , [profiles, filters, chips]);
   const toggleChip = (chip: string) => setChips((c) => c.includes(chip) ? c.filter((x) => x !== chip) : [...c, chip]);
-  const cardHeights = [560, 400, 480, 620, 430, 520, 470, 660, 380, 540];
   const resetFilters = () => { setFilters({ minAge: 22, maxAge: 36, distance: 25, verified: false, online: false, intention: "" }); setChips([]); setFilterOpen(false); };
   const reset = () => { setProfiles(DEMO_PROFILES); resetFilters(); setToast({ message: "Fresh recommendations are ready." }); };
   const applyFilters = () => { setFilterOpen(false); setToast({ message: "Discovery filters applied." }); };
   const decide = (person: DiscoveryProfile, action: "pass" | "like") => { setProfiles((items) => items.filter((item) => item.id !== person.id)); setToast({ message: action === "like" ? `You liked ${person.name}. Connection request sent.` : `${person.name} was passed for now.`, tone: action === "like" ? "emerald" : "rose" }); };
   return (
-    <section className="app-page relative z-10 !max-w-[1600px] !px-[20px] !pb-16 !pt-2 md:!px-[40px]">
+    <section className="app-page discover-page relative z-10 !max-w-[1600px] !px-[20px] !pb-16 !pt-2 md:!px-[40px]">
       <ToastNotice toast={toast}/>
+      <section className="mobile-discover-native" aria-label="Discover members">
+        <div className="mobile-discover-head"><h1>Discover</h1><button onClick={() => setFilterOpen(true)}><Filter size={14}/> Filters</button></div>
+        <div className="mobile-discover-list">{filtered.map((person) => <Link to={`/profiles/${person.id}`} className="mobile-discover-card" key={person.id}><img src={person.primaryPhoto} alt={`${person.name}'s profile`}/><div><span>{person.online ? "Online now" : "Active recently"}</span><h2>{person.name}, {person.age} {person.verified && <ShieldCheck size={14}/>}</h2><p><MapPin size={13}/>{person.location} · {person.distance} km away</p><small>{person.matchScore.overall}% match · {person.occupation}</small></div></Link>)}</div>
+      </section>
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="blob-1 absolute left-[-10%] top-[-10%] h-[50%] w-[50%] rounded-full bg-[#8c0026]/5 blur-[120px]"/>
         <div className="blob-2 absolute bottom-[-10%] right-[-5%] h-[60%] w-[60%] rounded-full bg-[#d7dff9]/25 blur-[150px]"/>
       </div>
-      <div className="flex items-start gap-6">
+      <div className="discover-desktop flex items-start gap-6">
         <aside className="no-scrollbar sticky top-20 hidden w-80 shrink-0 self-start overflow-y-auto pb-4 lg:block">
           <div className="glass-panel rounded-3xl p-6 shadow-[0_18px_45px_-24px_rgba(184,0,53,.28)]">
             <h3 className="font-heading text-base font-semibold tracking-tight text-[#191c1e]">Discovery</h3>
@@ -78,10 +81,11 @@ export function DiscoverPage() {
           <h1 className="font-heading text-2xl font-semibold tracking-tight text-[#191c1e]">Discover</h1>
           <button onClick={() => setFilterOpen(true)} className="flex items-center gap-1.5 rounded-full border border-[#e4bdbe]/50 bg-white/70 px-3.5 py-2 text-[11px] font-bold text-[#8c0026] backdrop-blur-md transition active:scale-95"><Filter size={14}/>Filters</button>
         </div>
-        <section className="min-w-0 flex-1">
-          {filtered.length ? <div className="discover-masonry">{filtered.map((person, index) => (
-            <article key={person.id} className="group relative cursor-pointer overflow-hidden rounded-2xl shadow-[0_22px_45px_-24px_rgba(140,0,38,.38)]">
-              <Link to={`/profiles/${person.id}`} className="block"><img src={person.primaryPhoto} alt={`${person.name}'s profile`} style={{ minHeight: cardHeights[index % cardHeights.length] }} className="h-auto w-full object-cover"/></Link>
+        <section className="discover-results min-w-0 flex-1">
+          {filtered.length ? <div className="discover-masonry">{filtered.map((person) => (
+            <article key={person.id} className="group relative min-h-[360px] cursor-pointer overflow-hidden rounded-2xl bg-[#565e74] shadow-[0_22px_45px_-24px_rgba(140,0,38,.38)] sm:min-h-[400px]">
+              <img src={person.primaryPhoto} alt={`${person.name}'s profile`} className="absolute inset-0 h-full w-full object-cover"/>
+              <Link to={`/profiles/${person.id}`} aria-label={`View ${person.name}'s profile`} className="absolute inset-0 z-[1]"/>
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"/>
               <div className="pointer-events-none absolute inset-x-4 top-4 flex items-start justify-between gap-2">
                 <span className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/20 px-3 py-1 text-[10px] font-bold text-white backdrop-blur-md"><span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400"/>{person.online ? "Online" : "Active"}</span>
@@ -96,7 +100,7 @@ export function DiscoverPage() {
                   {person.interests?.slice(0, 2).map((tag) => <span key={tag} className="flex items-center gap-1 rounded-full bg-white/20 px-2 py-1 text-[10px] font-semibold text-white">{interestGlyph(tag)}{tag}</span>)}
                 </div>
               </div>
-              <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <div className="absolute inset-0 z-10 flex items-center justify-center gap-3 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <button onClick={() => decide(person, "pass")} aria-label={`Pass ${person.name}`} className="flex h-12 w-12 items-center justify-center rounded-full bg-[#e6e8ea] text-[#5b4041] shadow-lg transition-all hover:scale-110 active:scale-95"><X size={22}/></button>
                 <button onClick={() => decide(person, "like")} aria-label={`Like ${person.name}`} className="flex h-16 w-16 items-center justify-center rounded-full bg-[#8c0026] text-white shadow-[0_16px_32px_-12px_rgba(184,0,53,.85)] transition-all hover:scale-110 active:scale-95"><Heart size={30} fill="currentColor"/></button>
                 <button onClick={() => setToast({ message: `You superliked ${person.name}!` })} aria-label={`Superlike ${person.name}`} className="flex h-12 w-12 items-center justify-center rounded-full bg-[#e6e8ea] text-[#5b4041] shadow-lg transition-all hover:scale-110 active:scale-95"><Star size={22}/></button>
@@ -109,21 +113,42 @@ export function DiscoverPage() {
     </section>
   );
 }
-function FilterPanel({ value, onChange, onClose, onReset }: { value: {minAge: number; maxAge: number; distance: number; verified: boolean; online: boolean; intention: string}; onChange: (value: {minAge: number; maxAge: number; distance: number; verified: boolean; online: boolean; intention: string}) => void; onClose: () => void; onReset: () => void }) { return <div className="modal-backdrop" onMouseDown={onClose}><aside className="filter-drawer" onMouseDown={(event) => event.stopPropagation()} aria-label="Discovery filters"><div className="drawer-head"><div><p className="kicker">Discover</p><h2>Fine tune your feed</h2></div><button onClick={onClose} className="icon-button" aria-label="Close filters"><X/></button></div><div className="drawer-body"><label className="control-label">Age range <span>{value.minAge}–{value.maxAge}</span></label><div className="range-pair"><input type="number" min="18" max="60" value={value.minAge} onChange={(event) => onChange({...value, minAge: +event.target.value})}/><input type="number" min="18" max="60" value={value.maxAge} onChange={(event) => onChange({...value, maxAge: +event.target.value})}/></div><label className="control-label mt-5">Maximum distance <span>{value.distance} km</span></label><input className="range" type="range" min="5" max="100" value={value.distance} onChange={(event) => onChange({...value, distance: +event.target.value})}/><label className="control-label mt-5">Relationship intention</label><select value={value.intention} onChange={(event) => onChange({...value, intention: event.target.value})}><option value="">Any intention</option><option>Long-term relationship</option></select><label className="toggle-row"><span><b>Online now</b><small>Show active members first</small></span><input checked={value.online} type="checkbox" onChange={(event) => onChange({...value, online: event.target.checked})}/></label><label className="toggle-row"><span><b>Verified only</b><small>Show confirmed profiles</small></span><input checked={value.verified} type="checkbox" onChange={(event) => onChange({...value, verified: event.target.checked})}/></label></div><div className="drawer-foot"><button className="button button-quiet" onClick={onReset}>Reset</button><button className="button button-primary" onClick={onClose}>Show people</button></div></aside></div>; }
+function FilterPanel({ value, onChange, onClose, onReset }: { value: {minAge: number; maxAge: number; distance: number; verified: boolean; online: boolean; intention: string}; onChange: (value: {minAge: number; maxAge: number; distance: number; verified: boolean; online: boolean; intention: string}) => void; onClose: () => void; onReset: () => void }) { return <div className="modal-backdrop" onMouseDown={onClose}><aside className="filter-drawer" onMouseDown={(event) => event.stopPropagation()} aria-label="Discovery filters"><div className="drawer-head"><div><p className="kicker">Discover</p><h2>Fine tune your feed</h2></div><button onClick={onClose} className="icon-button" aria-label="Close filters"><X/></button></div><div className="drawer-body"><label className="control-label">Age range <span>{value.minAge}–{value.maxAge}</span></label><div className="range-pair"><input type="number" min="18" max="60" value={value.minAge} onChange={(event) => onChange({...value, minAge: +event.target.value})}/><input type="number" min="18" max="60" value={value.maxAge} onChange={(event) => onChange({...value, maxAge: +event.target.value})}/></div><label className="control-label mt-5">Maximum distance <span>{value.distance} km</span></label><input className="range" type="range" min="5" max="100" value={value.distance} onChange={(event) => onChange({...value, distance: +event.target.value})}/><label className="control-label mt-5">Relationship intention</label><select value={value.intention} onChange={(event) => onChange({...value, intention: event.target.value})}><option value="">Any intention</option><option>Long-term relationship</option></select><label className="toggle-row"><span><b>Online now</b><small>Show active members first</small></span><input checked={value.online} type="checkbox" onChange={(event) => onChange({...value, online: event.target.checked})}/></label><label className="toggle-row"><span><b>Verified only</b><small>Show confirmed profiles</small></span><input checked={value.verified} type="checkbox" onChange={(event) => onChange({...value, verified: event.target.checked})}/></label></div><div className="drawer-foot"><button className="button button-quiet" onClick={onReset}>Reset</button><button className="button button-primary" onClick={onClose}>Apply filters</button></div></aside></div>; }
 
 
-export function ProfileDetailPage() { const { id } = useParams(); const navigate = useNavigate(); const person = DEMO_PROFILES.find((profile) => profile.id === id); const [tab, setTab] = useState("About"); const [liked, setLiked] = useState(false); if (!person) return <section className="app-page"><Empty title="Profile unavailable" copy="This profile may no longer be in your recommendations." cta={<Link className="button button-primary" to="/discover">Back to discover</Link>}/></section>; const items = { About: <><p>{person.bio}</p><div className="detail-columns"><Detail label="Looking for" value={person.relationshipGoal}/><Detail label="Work" value={person.occupation}/><Detail label="Education" value={person.education}/><Detail label="Languages" value={person.languages?.join(", ")}/></div></>, Interests: <div className="tag-grid">{person.interests?.map((item) => <Badge rose key={item}>{item}</Badge>)}{person.lifestyle?.map((item) => <Badge key={item}>{item}</Badge>)}</div>, Compatibility: <div className="match-breakdown"><Metric label="Overall fit" value={person.matchScore.overall}/><Metric label="Shared interests" value={person.matchScore.interests}/><Metric label="Lifestyle" value={person.matchScore.lifestyle}/><Metric label="Relationship goals" value={person.matchScore.goals}/></div> };
-  return <section className="app-page profile-detail"><button onClick={() => navigate(-1)} className="back-link"><ChevronLeft size={16}/> Back</button><div className="profile-hero"><img src={person.primaryPhoto} alt={person.name}/><div className="profile-hero-overlay"><div><span className="eyebrow-dark">{person.online ? "Online now" : "Active recently"}</span><h1>{person.name}, {person.age} <ShieldCheck size={19}/></h1><p><MapPin size={15}/>{person.location} · {person.matchScore.overall}% compatible</p></div><div className="hero-actions"><button onClick={() => setLiked(!liked)} className="icon-button light" aria-label="Like profile"><Heart size={19} fill={liked ? "currentColor" : "none"}/></button><Link to="/messages" className="button button-light"><MessageCircle size={15}/> Message</Link><button onClick={() => setLiked(true)} className="button button-primary">{liked ? "Request sent" : "Connect"}</button></div></div></div><div className="profile-content"><aside className="profile-side"><h2>At a glance</h2><p><MapPin size={15}/>{person.location} · {person.distance} km</p><p><UserCheck size={15}/>Verified member</p><p><Sparkles size={15}/>{person.relationshipGoal}</p><p><Clock size={15}/>{person.online ? "Online now" : <span title={person.lastActive}>Active {timeAgo(person.lastActive)}</span>}</p><div className="interest-row" style={{ marginTop: 4 }}>{person.lifestyle?.map((item) => <Badge key={item}>{item}</Badge>)}</div><div className="profile-side-images">{person.photos?.map((src) => <img src={src} alt="Profile detail" key={src}/>)}</div></aside><div className="profile-main"><div className="tabs">{Object.keys(items).map((name) => <button key={name} onClick={() => setTab(name)} className={tab === name ? "active" : ""}>{name}</button>)}</div><div className="profile-tab-content">{items[tab as keyof typeof items]}</div></div></div></section>; }
-function Detail({ label, value }: {label: string; value?: string}) { return <div><small>{label}</small><b>{value ?? "Not shared"}</b></div>; }
-function Metric({ label, value }: { label: string; value: number }) { return <div className="metric"><div><span>{label}</span><b>{value}%</b></div><i><em style={{width: `${value}%`}}/></i></div>; }
-
+export function ProfileDetailPage() {
+  const { id } = useParams(); const navigate = useNavigate();
+  const person = DEMO_PROFILES.find((profile) => profile.id === id);
+  const [liked, setLiked] = useState(false);
+  if (!person) return <section className="app-page"><Empty title="Profile unavailable" copy="This profile may no longer be in your recommendations." cta={<Link className="button button-primary" to="/discover">Back to discover</Link>}/></section>;
+  const photos = person.photos?.filter((src) => src !== person.primaryPhoto).slice(0, 2) ?? [];
+  const lifestyle = person.lifestyle?.slice(0, 3) ?? [];
+  return <section className="profile-view-page mx-auto max-w-7xl px-3 pb-24 pt-3 sm:px-5 md:px-8 md:pb-10 md:pt-6">
+    <button onClick={() => navigate(-1)} className="mb-3 inline-flex items-center gap-1 rounded-full border border-[#e4bdbe]/40 bg-white/70 px-2.5 py-1.5 text-[11px] font-semibold text-[#8c0026] backdrop-blur md:hidden"><ArrowLeft size={14}/> Back</button>
+    <section className="relative h-[420px] overflow-hidden rounded-2xl shadow-[0_12px_36px_-14px_rgba(140,0,38,.35)] sm:h-[520px] md:h-[590px]">
+      <img src={person.primaryPhoto} alt={person.name} className="h-full w-full object-cover"/>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent"/>
+      <div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-3 sm:inset-x-6 sm:bottom-6">
+        <div className="min-w-0 text-white"><span className="rounded-full bg-white/15 px-2 py-1 text-[9px] font-bold uppercase tracking-wider backdrop-blur">{person.online ? "Online now" : "Active recently"}</span><h1 className="mt-2 font-heading text-[26px] font-semibold leading-none tracking-tight sm:text-[32px]">{person.name}, {person.age} {person.verified && <ShieldCheck size={17} className="mb-1 inline-block text-[#ffc5c7]"/>}</h1><p className="mt-1 flex items-center gap-1 text-[11px] text-white/85 sm:text-[12px]"><MapPin size={13}/>{person.location} · {person.distance} km away</p></div>
+        <div className="hidden shrink-0 gap-2 md:flex"><button onClick={() => setLiked(false)} className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-[11px] font-bold text-white backdrop-blur"><X size={15}/>Pass</button><button onClick={() => setLiked(true)} className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#8c0026] to-[#b80035] px-4 py-2 text-[11px] font-bold text-white shadow-lg"><Heart size={15} fill="currentColor"/>{liked ? "Liked" : "Like profile"}</button></div>
+      </div>
+    </section>
+    <section className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+      <article className="profile-glass flex min-h-[178px] flex-col items-center justify-center rounded-2xl p-4 text-center"><div className="grid h-20 w-20 place-items-center rounded-full border-[6px] border-[#e11d48] text-[22px] font-bold text-[#8c0026]">{person.matchScore.overall}%</div><h2 className="mt-2 text-[14px] font-semibold text-[#191c1e]">Exceptional match</h2><p className="mt-1 max-w-[220px] text-[10px] leading-4 text-[#565e74]">Based on your shared values and lifestyle choices.</p></article>
+      <article className="profile-glass rounded-2xl p-4 md:col-span-2"><h2 className="text-[15px] font-semibold text-[#8c0026]">The story</h2><p className="mt-2 text-[12px] leading-5 text-[#5b4041]">{person.bio} I value honest conversation, everyday kindness, and making time for the people who matter. I’m here to meet someone who enjoys building a meaningful connection at a comfortable pace.</p></article>
+      <article className="profile-glass rounded-2xl p-4"><h3 className="text-[10px] font-bold uppercase tracking-[.14em] text-[#565e74]">Lifestyle</h3><div className="mt-3 space-y-2 text-[11px] text-[#191c1e]"><p className="flex items-center gap-2"><Briefcase size={14} className="text-[#8c0026]"/>{person.occupation ?? "Member"}</p><p className="flex items-center gap-2"><BookOpen size={14} className="text-[#8c0026]"/>{person.education ?? "Education not shared"}</p><p className="flex items-center gap-2"><Sparkles size={14} className="text-[#8c0026]"/>{lifestyle[0] ?? person.relationshipGoal}</p></div></article>
+      <article className="profile-glass rounded-2xl p-4 md:col-span-2"><h3 className="text-[10px] font-bold uppercase tracking-[.14em] text-[#565e74]">Passions & interests</h3><div className="mt-3 flex flex-wrap gap-1.5">{[...(person.interests ?? []), ...lifestyle.slice(1)].map((item) => <span key={item} className="rounded-full bg-[#8c0026]/10 px-2.5 py-1 text-[10px] font-semibold text-[#8c0026]">{item}</span>)}</div></article>
+    </section>
+    {photos.length > 0 && <section className="mt-4 grid grid-cols-2 gap-3">{photos.map((src) => <img key={src} src={src} alt={`${person.name}'s gallery`} className="h-40 w-full rounded-2xl object-cover shadow-sm sm:h-56"/>)}</section>}
+    <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-[#e4bdbe]/30 bg-white/80 p-3 pb-6 backdrop-blur md:hidden"><button onClick={() => setLiked(false)} className="flex flex-1 items-center justify-center gap-1 rounded-full bg-[#e6e8ea] py-2 text-[11px] font-bold text-[#191c1e]"><X size={15}/>Pass</button><button onClick={() => setLiked(true)} className="flex flex-1 items-center justify-center gap-1 rounded-full bg-gradient-to-r from-[#8c0026] to-[#b80035] py-2 text-[11px] font-bold text-white"><Heart size={15} fill="currentColor"/>{liked ? "Liked" : "Like"}</button></div>
+  </section>;
+}
 export function MatchesPage() {
   const [tab, setTab] = useState<"Mutual" | "Interested" | "My Likes">("Mutual");
   const [matches, setMatches] = useState<DiscoveryProfile[]>(DEMO_MATCHES.slice(0, 3));
   const [toast, setToast] = useState<Toast>(null);
   const remove = (id: string) => { setMatches((items) => items.filter((i) => i.id !== id)); setToast({ message: "Match removed from your list." }); };
   const shown = matches.length ? matches : DEMO_MATCHES.slice(0, 3);
-  const cardHeights = [320, 380, 430];
   return (
     <section className="relative mx-auto max-w-7xl px-[20px] pb-24 pt-6 md:px-[40px] md:pt-10">
       <ToastNotice toast={toast}/>
@@ -137,9 +162,10 @@ export function MatchesPage() {
       </div>
       {/* Matches Grid (discover-style cards) */}
       <div className="discover-masonry">
-        {shown.map((p, index) => (
-          <article key={p.id} className="group relative cursor-pointer overflow-hidden rounded-2xl shadow-[0_22px_45px_-24px_rgba(140,0,38,0.38)]">
-            <Link to={`/profiles/${p.id}`} className="block"><img src={p.primaryPhoto} alt={`${p.name}'s profile`} style={{ minHeight: cardHeights[index % cardHeights.length] }} className="h-auto w-full object-cover"/></Link>
+        {shown.map((p) => (
+          <article key={p.id} className="group relative min-h-[360px] cursor-pointer overflow-hidden rounded-2xl bg-[#565e74] shadow-[0_22px_45px_-24px_rgba(140,0,38,0.38)] sm:min-h-[400px]">
+            <img src={p.primaryPhoto} alt={`${p.name}'s profile`} className="absolute inset-0 h-full w-full object-cover"/>
+            <Link to={`/profiles/${p.id}`} aria-label={`View ${p.name}'s profile`} className="absolute inset-0 z-[1]"/>
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"/>
             <div className="pointer-events-none absolute inset-x-4 top-4 flex items-start justify-between gap-2">
               <span className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/20 px-3 py-1 text-[10px] font-bold text-white backdrop-blur-md"><span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400"/>{p.online ? "Online" : "Active"}</span>
@@ -154,7 +180,7 @@ export function MatchesPage() {
                 {p.interests?.slice(0, 2).map((tag) => <span key={tag} className="flex items-center gap-1 rounded-full bg-white/20 px-2 py-1 text-[10px] font-semibold text-white">{interestGlyph(tag)}{tag}</span>)}
               </div>
             </div>
-            <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div className="absolute inset-0 z-10 flex items-center justify-center gap-3 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               <button onClick={() => remove(p.id)} aria-label={`Pass ${p.name}`} className="flex h-12 w-12 items-center justify-center rounded-full bg-[#e6e8ea] text-[#5b4041] shadow-lg transition-all hover:scale-110 active:scale-95"><X size={22}/></button>
               <button onClick={() => { setToast({ message: `You matched with ${p.name}! Start a conversation.` }); }} aria-label={`Like ${p.name}`} className="flex h-16 w-16 items-center justify-center rounded-full bg-[#8c0026] text-white shadow-[0_16px_32px_-12px_rgba(184,0,53,0.85)] transition-all hover:scale-110 active:scale-95"><Heart size={30} fill="currentColor"/></button>
               <button onClick={() => { setToast({ message: `You superliked ${p.name}!` }); }} aria-label={`Superlike ${p.name}`} className="flex h-12 w-12 items-center justify-center rounded-full bg-[#e6e8ea] text-[#5b4041] shadow-lg transition-all hover:scale-110 active:scale-95"><Star size={22}/></button>
@@ -206,16 +232,16 @@ export function ConnectionsPage() {
           return (
             <div key={connection.id} className="glass-panel ambient-shadow relative flex flex-col gap-3 overflow-hidden rounded-[20px] p-4 transition-transform duration-300 hover:-translate-y-1">
               <div className="flex items-start justify-between">
-                <div className="relative h-20 w-20 overflow-hidden rounded-full border-2 border-white shadow-md">
+                <Link to={`/profiles/${u.id}`} aria-label={`View ${u.name}'s profile`} className="relative h-20 w-20 overflow-hidden rounded-full border-2 border-white shadow-md transition-transform hover:scale-105">
                   <img className="h-full w-full object-cover" src={u.primaryPhoto} alt={u.name}/>
-                </div>
+                </Link>
                 <div className="flex gap-1">
                   <Link to="/messages" title="Message" className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#8c0026] shadow-sm transition-transform hover:scale-105"><span className="material-symbols-outlined text-[16px]">chat_bubble</span></Link>
                   <button onClick={() => removeSlot(connection.id)} title="More options" className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#5b4041] shadow-sm transition-transform hover:scale-105"><span className="material-symbols-outlined text-[16px]">more_vert</span></button>
                 </div>
               </div>
               <div>
-                <h3 className="text-[20px] font-semibold leading-[26px] text-[#191c1e]" style={pj}>{u.name}, {u.age}</h3>
+                <Link to={`/profiles/${u.id}`} className="text-[20px] font-semibold leading-[26px] text-[#191c1e] hover:text-[#8c0026]" style={pj}>{u.name}, {u.age}</Link>
                 <p className="mt-1 flex items-center gap-1 text-[13px] font-medium leading-[18px] text-[#8c0026]">
                   {u.online ? <span className="h-2 w-2 animate-pulse rounded-full bg-[#e11d48]"/> : <span className="material-symbols-outlined text-[14px]">schedule</span>}
                   {u.online ? "Active 2h ago" : "Active yesterday"}
@@ -271,7 +297,7 @@ export function ConnectionsPage() {
           </div>
           <ul className="space-y-2">
             {history.map((h) => (
-              <li key={h.p.id} className="flex cursor-pointer items-center justify-between rounded-lg p-1.5 transition-colors hover:bg-white/50">
+            <li key={h.p.id}><Link to={`/profiles/${h.p.id}`} className="flex cursor-pointer items-center justify-between rounded-lg p-1.5 transition-colors hover:bg-white/50">
                 <div className="flex items-center gap-2">
                   <img className={"h-9 w-9 rounded-full object-cover " + (h.dim ? "opacity-60 grayscale" : "")} src={h.p.primaryPhoto} alt={h.p.name}/>
                   <div>
@@ -280,7 +306,7 @@ export function ConnectionsPage() {
                   </div>
                 </div>
                 <span className="material-symbols-outlined text-[18px] text-[#5b4041]">chevron_right</span>
-              </li>
+            </Link></li>
             ))}
           </ul>
         </div>
@@ -298,8 +324,10 @@ function MessagesShell() {
   const [conversations, setConversations] = useState<Conversation[]>(DEMO_CONVERSATIONS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState(""); const [pane, setPane] = useState<"all" | "unread" | "online">("all"); const [draft, setDraft] = useState(""); const [typing, setTyping] = useState(false);
+  const messageEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => { if (window.innerWidth >= 768) setSelectedId((c) => c ?? DEMO_CONVERSATIONS[0]?.id ?? null); }, []);
   const selected = conversations.find((item) => item.id === selectedId);
+  useEffect(() => { requestAnimationFrame(() => messageEndRef.current?.scrollIntoView({ block: "end" })); }, [selectedId, selected?.messages.length, typing]);
   const filtered = conversations.filter((item) => item.user.name.toLowerCase().includes(query.toLowerCase()) && (pane === "all" ? true : pane === "unread" ? item.unread > 0 : item.online));
   const select = (id: string) => { setSelectedId(id); setConversations((items) => items.map((item) => item.id === id ? {...item, unread: 0} : item)); };
   const send = (event: FormEvent) => { event.preventDefault(); const text = draft.trim(); if (!text || !selected) return; const msg: Message = { id: `new-${Date.now()}`, conversationId: selected.id, senderId: "me", text, status: "read", createdAt: new Date().toISOString() }; setConversations((items) => items.map((item) => item.id === selected.id ? {...item, messages: [...item.messages, msg], unread: 0} : item)); setDraft(""); setTyping(true); window.setTimeout(() => { setTyping(false); const reply: Message = { id: `reply-${Date.now()}`, conversationId: selected.id, senderId: "them", text: "That sounds lovely — I’d like that!", status: "read", createdAt: new Date().toISOString() }; setConversations((items) => items.map((item) => item.id === selected.id ? {...item, messages: [...item.messages, reply]} : item)); }, 1300); };
@@ -310,17 +338,16 @@ function MessagesShell() {
     </aside>
     {selected ? <section className="chat3">
       <div className="chat3-bg"><div className="chat3-blob1"/><div className="chat3-blob2"/></div>
-      <div className="chat3-glass"><div className="chat3-who"><button className="icon-button mobile-back" onClick={() => setSelectedId(null)} aria-label="Back"><ArrowLeft size={18}/></button><img src={selected.user.primaryPhoto} alt={selected.user.name}/><div><h2>{selected.user.name} {selected.user.verified && <BadgeCheck size={15}/>}</h2><p className="chat3-online"><span/>{selected.user.online ? "Online" : "Active recently"}</p></div></div><div className="chat3-actions"><button className="icon-button" aria-label="Video call"><Video size={18}/></button><button className="icon-button" aria-label="Profile info"><Info size={18}/></button></div></div>
+      <div className="chat3-glass"><div className="chat3-who"><button className="icon-button mobile-back" onClick={() => setSelectedId(null)} aria-label="Back"><ArrowLeft size={18}/></button><Link to={`/profiles/${selected.user.id}`} aria-label={`View ${selected.user.name}'s profile`}><img src={selected.user.primaryPhoto} alt={selected.user.name}/></Link><Link to={`/profiles/${selected.user.id}`}><div><h2>{selected.user.name} {selected.user.verified && <BadgeCheck size={15}/>}</h2><p className="chat3-online"><span/>{selected.user.online ? "Online" : "Active recently"}</p></div></Link></div><div className="chat3-actions"><button className="icon-button" aria-label="Video call"><Video size={18}/></button><Link to={`/profiles/${selected.user.id}`} className="icon-button" aria-label="View profile"><Info size={18}/></Link></div></div>
       <div className="chat3-stream">
         <div className="chat3-day"><span>{formatChatDate(selected.messages[0]?.createdAt ?? new Date().toISOString())}</span></div>
-        {selected.messages.map((message, index) => message.senderId === "me" ? <div key={message.id} className="chat3-row out"><div className="chat3-bubble-out"><span>{message.text}</span><small className="chat3-meta" style={{ color: "rgba(255,255,255,.75)" }}>{formatChatTime(message.createdAt)} · {index === selected.messages.length - 1 ? "Delivered" : "Seen"}</small></div></div> : <div key={message.id} className="chat3-row"><img className="ava" src={selected.user.primaryPhoto} alt={selected.user.name}/><div className="chat3-bubble-in"><span>{message.text}</span><small className="chat3-meta">{formatChatTime(message.createdAt)}</small></div></div>)}
-        {selected.id === "1" && <div className="chat3-row out"><div className="chat3-media"><img src="https://images.unsplash.com/photo-1519150268069-c094f2320f54?auto=format&fit=crop&w=500&q=80" alt="Shared venue"/></div></div>}
+        {selected.messages.map((message, index) => message.senderId === "me" ? <div key={message.id} className="chat3-row out"><div className="chat3-bubble-out"><span>{message.text}</span><small className="chat3-meta" style={{ color: "rgba(255,255,255,.75)" }}>{formatChatTime(message.createdAt)} · {index === selected.messages.length - 1 ? "Delivered" : "Seen"}</small></div></div> : <div key={message.id} className="chat3-row"><Link to={`/profiles/${selected.user.id}`}><img className="ava" src={selected.user.primaryPhoto} alt={selected.user.name}/></Link><div className="chat3-bubble-in"><span>{message.text}</span><small className="chat3-meta">{formatChatTime(message.createdAt)}</small></div></div>)}
         {typing && <div className="chat3-row"><img className="ava" src={selected.user.primaryPhoto} alt={selected.user.name}/><div className="chat3-typing"><span className="typing-dot"/><span className="typing-dot"/><span className="typing-dot"/></div></div>}
-        <div className="h-4"/>
+        <div className="h-4" ref={messageEndRef}/>
       </div>
       <div className="chat3-input"><form className="chat3-form" onSubmit={send}><button type="button" className="icon-button" aria-label="Add media"><Plus size={18}/></button><textarea rows={1} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Type a message..."/><button type="button" className="icon-button" aria-label="Emoji"><Smile size={18}/></button><button className="chat3-send" aria-label="Send message"><Send size={17}/></button></form></div>
     </section> : <section className="chat3"><div className="chat3-bg"><div className="chat3-blob1"/><div className="chat3-blob2"/></div><div className="chat3-stream" style={{ justifyContent: "center", alignItems: "center" }}><Empty icon={MessageCircle} title="Select a conversation" copy="Choose a conversation from the list to start chatting."/></div></section>}
-    {selected && <aside className="profile3"><div className="profile3-cover"><img src={selected.user.photos?.[1] ?? selected.user.primaryPhoto} alt={selected.user.name}/></div><div className="profile3-body"><div className="profile3-card"><h2>{selected.user.name}, {selected.user.age} <BadgeCheck size={18}/></h2><p className="profile3-loc"><MapPin size={14}/>{selected.user.location} · {selected.user.distance} km away</p><p className="profile3-quote">“{(selected.user.bio ?? "Looking for someone genuine.").slice(0, 48)}…”</p></div><div className="profile3-vibe"><h3>Vibe</h3><div className="tag-grid">{selected.user.interests?.slice(0, 6).map((interest) => { const Icon = vibeIcon(interest); return <span className="vibe-chip" key={interest}><Icon size={13}/>{interest}</span>; })}</div></div></div></aside>}
+    {selected && <aside className="profile3"><div className="profile3-cover"><Link to={`/profiles/${selected.user.id}`}><img src={selected.user.photos?.[1] ?? selected.user.primaryPhoto} alt={selected.user.name}/></Link></div><div className="profile3-body"><div className="profile3-card"><Link to={`/profiles/${selected.user.id}`}><h2>{selected.user.name}, {selected.user.age} <BadgeCheck size={18}/></h2></Link><p className="profile3-loc"><MapPin size={14}/>{selected.user.location} · {selected.user.distance} km away</p><p className="profile3-quote">“{(selected.user.bio ?? "Looking for someone genuine.").slice(0, 48)}…”</p></div><div className="profile3-vibe"><h3>Vibe</h3><div className="tag-grid">{selected.user.interests?.slice(0, 6).map((interest) => { const Icon = vibeIcon(interest); return <span className="vibe-chip" key={interest}><Icon size={13}/>{interest}</span>; })}</div></div></div></aside>}
   </div></section>;
 }
 
@@ -336,7 +363,7 @@ export function NotificationsPage() {
   const unread = items.filter((i) => !i.read).length;
   return <section className="app-page"><ToastNotice toast={toast}/><PageTitle title="Notifications" copy="Keep up with activity around your connections." action={<button className="button button-quiet" onClick={markAll}><Check size={15}/>{unread ? `Mark all read (${unread})` : "No unread"}</button>}/>
     {unread > 0 && <div className="stat-grid" style={{ gridTemplateColumns: "repeat(3,1fr)" }}><div className="stat-card"><span><Bell size={17}/></span><div><b>{unread}</b><small>Unread</small></div></div><div className="stat-card"><span><UserPlus size={17}/></span><div><b>{items.filter((i) => i.type === "connection_request").length}</b><small>Requests</small></div></div><div className="stat-card"><span><Heart size={17}/></span><div><b>{items.filter((i) => i.type === "like").length}</b><small>Likes</small></div></div></div>}
-    {groups.map(([label, list]) => <div className="notification-group" key={label}><h2 className="notification-group-title">{label} <span className="count">{list.length}</span></h2><div className="notification-list">{list.map((item) => { const Icon = notifIcon[item.type] ?? Bell; return <article className={`notification ${item.read ? "" : "unread-notification"}`} key={item.id}>{item.actor?.photo ? <img className="notification-avatar" src={item.actor.photo} alt={item.actor.name}/> : <span className="notification-icon"><Icon size={16}/></span>}<div><h2>{item.title}</h2><p>{item.body}</p><small>{timeAgo(item.createdAt)}</small></div>{!item.read && <div className="n-actions"><button onClick={() => markRead(item.id)}>Mark read</button></div>}</article>; })}</div></div>)}
+    {groups.map(([label, list]) => <div className="notification-group" key={label}><h2 className="notification-group-title">{label} <span className="count">{list.length}</span></h2><div className="notification-list">{list.map((item) => { const Icon = notifIcon[item.type] ?? Bell; return <article className={`notification ${item.read ? "" : "unread-notification"}`} key={item.id}>{item.actor?.photo && item.actor.id ? <Link to={`/profiles/${item.actor.id}`}><img className="notification-avatar" src={item.actor.photo} alt={item.actor.name}/></Link> : <span className="notification-icon"><Icon size={16}/></span>}<div><h2>{item.title}</h2><p>{item.body}</p><small>{timeAgo(item.createdAt)}</small></div>{!item.read && <div className="n-actions"><button onClick={() => markRead(item.id)}>Mark read</button></div>}</article>; })}</div></div>)}
     {!items.length && <Empty icon={Bell} title="You're all caught up" copy="When something happens around your connections, it will appear here."/>}
   </section>; }
 function isTodayDate(iso: string) { const d = new Date(iso); const n = new Date(); return d.toDateString() === n.toDateString(); }
