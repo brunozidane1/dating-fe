@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { ReactNode } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { ArrowRight, ChevronDown, Heart, Lock, MessageCircle, ShieldCheck, Sparkles, UserRoundCheck, UsersRound } from "lucide-react";
+import { ArrowRight, Heart, Lock, MessageCircle, ShieldCheck, Sparkles, UserRoundCheck, UsersRound } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Image = "https://images.unsplash.com/";
@@ -20,12 +20,10 @@ const testimonials = [
   { name: "Elena, 29", quote: "The three-chat limit completely changed how I connect. I'm actually getting to know people again.", src: `${Image}photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=85`, rotate: "rotate-2 md:mt-16" },
   { name: "David, 41", quote: "It feels like an exclusive members club, but for romance. Highly curated.", src: `${Image}photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=85`, rotate: "-rotate-1 md:mt-32" },
 ];
-const faqs = [["Why limit conversations to three?", "We believe focus makes room for presence. A smaller number of active conversations helps people be more selective, attentive and kind."], ["How does the curation process work?", "Recommendations consider more than distance: your interests, lifestyle markers and relationship intentions all help surface relevant people."], ["What happens if a conversation stalls?", "An inactive chat can gently expire, freeing up room for both people to pursue new and more active connections without unnecessary pressure."]];
 
 export default function Home() {
-  const [openFaq, setOpenFaq] = useState(0);
   useEffect(() => { AOS.init({ duration: 650, once: true, offset: 45, easing: "ease-out-cubic" }); }, []);
-  return <div className="bg-[#f7f9fb] text-[#191c1e] font-body overflow-x-hidden">
+  return <div className="home-page w-full max-w-full overflow-x-hidden bg-[#f7f9fb] text-[#191c1e] font-body">
     <section className="relative flex min-h-[630px] items-center overflow-hidden md:min-h-[680px]">
       <img src={`${Image}photo-1507504031003-b417219a0fde?auto=format&fit=crop&w=1900&q=90`} alt="Couple sharing an intimate moment" className="absolute inset-0 h-full w-full object-cover"/>
       <div className="absolute inset-0 bg-gradient-to-r from-[#f7f9fb]/95 via-[#f7f9fb]/72 to-[#f7f9fb]/10"/>
@@ -49,7 +47,6 @@ export default function Home() {
     <section className="relative overflow-hidden bg-[#f2f4f6] px-5 py-16 text-center md:px-10 md:py-20"><div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(184,0,53,.12),transparent_36%)]"/><div className="relative mx-auto max-w-4xl"><UsersRound data-aos="zoom-in" className="mx-auto text-[#8c0026]" size={40}/><h2 data-aos="fade-up" className="mt-4 font-heading text-3xl font-semibold tracking-[-.04em]">The Inner Circle Philosophy</h2><p data-aos="fade-up" className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600">Quality requires focus. Lume limits active conversations to three, ensuring every connection receives the attention it deserves.</p><div className="mt-9 grid gap-4 md:grid-cols-3"><Slot type="active" title="Active" text="Currently connecting"/><Slot type="pending" title="Pending" text="Awaiting reply"/><Slot type="available" title="Available" text="Space for someone new"/></div></div></section>
     <section className="border-y border-rose-100 bg-white px-5 py-10 md:px-10"><div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 md:flex-row"><h3 className="font-heading text-lg font-semibold">Active Lume Hubs</h3><div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-semibold text-slate-500">{["New York", "London", "Paris", "Tokyo", "Berlin", "Kigali"].map((city) => <span className="flex items-center gap-2" key={city}><i className="h-2 w-2 rounded-full bg-[#8c0026]"/>{city}</span>)}</div></div></section>
     <section className="bg-[#f2f4f6] px-5 py-16 md:px-10 md:py-20"><div className="mx-auto max-w-7xl"><div data-aos="fade-up" className="mx-auto max-w-2xl text-center"><h2 className="font-heading text-3xl font-semibold tracking-[-.04em]">Intimacy built on trust</h2><p className="mt-3 text-sm leading-7 text-slate-600">Meaningful connections start with a secure environment. Every part of Lume is built around a private, verified community.</p></div><div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><SafetyCard icon={<UserRoundCheck/>} title="Human verification" copy="Every member is reviewed to support an authentic community."/><SafetyCard icon={<Lock/>} title="Private by design" copy="Your conversations and profile details stay in your control."/><SafetyCard icon={<ShieldCheck/>} title="Community standards" copy="A clear code of conduct keeps the space respectful."/><SafetyCard icon={<MessageCircle/>} title="Safety concierge" copy="Guidance is there whenever you need it."/></div></div></section>
-    <section className="bg-white px-5 py-16 md:px-10 md:py-20"><div className="mx-auto max-w-3xl"><h2 data-aos="fade-up" className="text-center font-heading text-3xl font-semibold tracking-[-.04em]">Intentional Inquiries</h2><div className="mt-8 space-y-3">{faqs.map(([question, answer], index) => <article data-aos="fade-up" data-aos-delay={index * 90} className="rounded-2xl border border-rose-100 bg-white" key={question}><button onClick={() => setOpenFaq(openFaq === index ? -1 : index)} className="flex w-full items-center justify-between gap-4 p-5 text-left font-heading text-sm font-semibold text-slate-800"><span>{question}</span><ChevronDown className={`shrink-0 text-[#8c0026] transition ${openFaq === index ? "rotate-180" : ""}`} size={18}/></button>{openFaq === index && <p className="px-5 pb-5 text-sm leading-6 text-slate-600">{answer}</p>}</article>)}</div></div></section>
   </div>;
 }
 function TickerContent() { return <div className="flex items-center gap-8"><span className="flex items-center gap-2"><Heart size={13} fill="currentColor"/>Amelia & Julian just matched!</span><span className="opacity-50">•</span><span className="flex items-center gap-2"><MessageCircle size={13}/>5,420 intentional conversations today</span><span className="opacity-50">•</span><span className="flex items-center gap-2"><Sparkles size={13}/>New member from Kigali joined</span><span className="opacity-50">•</span><span>320 coffee dates planned this weekend</span></div>; }

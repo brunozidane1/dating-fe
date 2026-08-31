@@ -50,13 +50,14 @@ export default function Header() {
         <div className="flex items-center gap-4">
           <Link to="/pricing" aria-label="Premium" className="text-[#8c0026] transition-all hover:opacity-80 active:scale-95"><span className="material-symbols-outlined">crown</span></Link>
           <Link to="/notifications" aria-label="Notifications" className="relative text-[#8c0026] transition-all hover:opacity-80 active:scale-95"><span className="material-symbols-outlined">notifications</span></Link>
-          <Link to="/profile" className="ml-2" aria-label="Your profile"><img className="h-10 w-10 rounded-full border-2 border-[#e4bdbe]/30 object-cover" src={avatar} alt="Your profile" /></Link>
+          <Link to="/login" className="ml-1 inline-flex items-center gap-2 rounded-full border border-[#e4bdbe]/50 bg-white/65 px-3 py-2 text-[11px] font-bold text-[#8c0026] transition hover:bg-[#ffdada]/45" aria-label="Account sign in"><img className="h-5 w-5 rounded-full object-cover" src={avatar} alt="" />Account</Link>
         </div>
       </header>
 
       {/* Mobile Top Header (page title) */}
-      <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-center border-b border-[#e4bdbe]/20 bg-white/80 backdrop-blur-md md:hidden">
+      <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-center border-b border-[#e4bdbe]/20 bg-white/80 px-3 backdrop-blur-md md:hidden">
         <span style={headline} className="text-2xl font-bold tracking-[-0.02em] text-[#8c0026]">{title}</span>
+        <Link to="/login" aria-label="Account sign in" className="absolute right-3 inline-flex items-center gap-1 rounded-full border border-[#e4bdbe]/50 bg-white/70 px-2.5 py-1.5 text-[9px] font-bold text-[#8c0026]"><img className="h-4 w-4 rounded-full object-cover" src={avatar} alt=""/>Account</Link>
       </header>
 
       {/* Mobile Bottom Navigation (reference style) */}
