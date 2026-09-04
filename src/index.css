@@ -68,6 +68,12 @@ button, input, textarea { font: inherit; }
 .home-ticker { animation: lumeTicker 24s linear infinite; }
 .home-ticker:hover { animation-play-state: paused; }
 
+/* Gentle heart movement across the full landing page. */
+.home-hearts { position: absolute; z-index: 20; inset: 0; overflow: hidden; pointer-events: none; }
+.home-heart { position: absolute; display: grid; place-items: center; color: rgba(184, 0, 53, .38); filter: drop-shadow(0 8px 10px rgba(140, 0, 38, .12)); animation: homeHeartFloat var(--heart-duration, 10s) ease-in-out var(--heart-delay, 0s) infinite; }
+@keyframes homeHeartFloat { 0%, 100% { opacity: .14; transform: translate3d(0, 14px, 0) scale(.82) rotate(-8deg); } 22% { opacity: .58; } 50% { opacity: .38; transform: translate3d(20px, -52px, 0) scale(1.12) rotate(8deg); } 78% { opacity: .52; } }
+@media (prefers-reduced-motion: reduce) { .home-heart { animation: none; opacity: .28; } }
+
 /* Global support entry point. */
 .help-widget { position: fixed; z-index: 80; right: 18px; bottom: 20px; }.help-toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; border: 1px solid rgba(255,255,255,.55); border-radius: 999px; padding: 0 13px; background: #8c0026; color: #fff; box-shadow: 0 13px 25px -13px rgba(140,0,38,.8); font-size: 11px; font-weight: 800; }.help-popover { position: absolute; right: 0; bottom: 48px; width: 230px; padding: 15px; border: 1px solid rgba(228,189,190,.6); border-radius: 16px; background: rgba(255,255,255,.95); box-shadow: 0 18px 35px -20px rgba(15,23,42,.4); backdrop-filter: blur(14px); }.help-popover > button { position: absolute; top: 8px; right: 8px; display: grid; width: 25px; height: 25px; place-items: center; border: 0; border-radius: 50%; background: #f2f4f6; color: #5b4041; }.help-popover strong { display: block; color: #191c1e; font-family: 'Plus Jakarta Sans',sans-serif; font-size: 13px; }.help-popover p { margin: 5px 0 11px; color: #5b4041; font-size: 10px; line-height: 1.5; }.help-popover a { color: #8c0026; font-size: 10px; font-weight: 800; }.help-widget:has(.help-popover) .help-toggle { display: none; }@media (max-width: 767px) { .help-widget { right: 12px; bottom: 95px; }.help-popover { bottom: 47px; width: 218px; } }
 

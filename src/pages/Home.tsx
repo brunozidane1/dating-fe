@@ -20,14 +20,35 @@ const testimonials = [
   { name: "Elena, 29", quote: "The three-chat limit completely changed how I connect. I'm actually getting to know people again.", src: `${Image}photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=85`, rotate: "rotate-2 md:mt-16" },
   { name: "David, 41", quote: "It feels like an exclusive members club, but for romance. Highly curated.", src: `${Image}photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=85`, rotate: "-rotate-1 md:mt-32" },
 ];
+const floatingHearts = [
+  { left: "7%", top: "2%", size: 20, delay: "-1s", duration: "9s" },
+  { left: "82%", top: "4%", size: 15, delay: "-5s", duration: "11s" },
+  { left: "50%", top: "9%", size: 16, delay: "-3s", duration: "10s" },
+  { left: "93%", top: "14%", size: 19, delay: "-6s", duration: "10s" },
+  { left: "12%", top: "20%", size: 13, delay: "-2s", duration: "8s" },
+  { left: "70%", top: "25%", size: 24, delay: "-7s", duration: "12s" },
+  { left: "34%", top: "31%", size: 14, delay: "-4s", duration: "9s" },
+  { left: "88%", top: "37%", size: 18, delay: "-8s", duration: "11s" },
+  { left: "6%", top: "43%", size: 22, delay: "-3s", duration: "12s" },
+  { left: "58%", top: "48%", size: 13, delay: "-6s", duration: "8s" },
+  { left: "24%", top: "54%", size: 17, delay: "-2s", duration: "10s" },
+  { left: "78%", top: "60%", size: 20, delay: "-5s", duration: "11s" },
+  { left: "42%", top: "66%", size: 14, delay: "-7s", duration: "9s" },
+  { left: "94%", top: "71%", size: 18, delay: "-1s", duration: "12s" },
+  { left: "11%", top: "77%", size: 16, delay: "-4s", duration: "10s" },
+  { left: "66%", top: "83%", size: 23, delay: "-8s", duration: "11s" },
+  { left: "31%", top: "89%", size: 13, delay: "-6s", duration: "8s" },
+  { left: "86%", top: "95%", size: 19, delay: "-3s", duration: "10s" },
+];
 
 export default function Home() {
   useEffect(() => { AOS.init({ duration: 650, once: true, offset: 45, easing: "ease-out-cubic" }); }, []);
-  return <div className="home-page w-full max-w-full overflow-x-hidden bg-[#f7f9fb] text-[#191c1e] font-body">
+  return <div className="home-page relative w-full max-w-full overflow-x-hidden bg-[#f7f9fb] text-[#191c1e] font-body">
+    <div className="home-hearts" aria-hidden="true">{floatingHearts.map((heart, index) => <span key={index} className="home-heart" style={{ left: heart.left, top: heart.top, "--heart-delay": heart.delay, "--heart-duration": heart.duration } as React.CSSProperties}><Heart size={heart.size} fill="currentColor" strokeWidth={1.5}/></span>)}</div>
     <section className="relative flex min-h-[630px] items-center overflow-hidden md:min-h-[680px]">
       <img src={`${Image}photo-1507504031003-b417219a0fde?auto=format&fit=crop&w=1900&q=90`} alt="Couple sharing an intimate moment" className="absolute inset-0 h-full w-full object-cover"/>
       <div className="absolute inset-0 bg-gradient-to-r from-[#f7f9fb]/95 via-[#f7f9fb]/72 to-[#f7f9fb]/10"/>
-      <div className="relative mx-auto flex w-full max-w-7xl items-center px-5 py-24 md:px-10">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center px-5 py-24 md:px-10">
         <div data-aos="fade-right" className="relative w-full max-w-[490px] rounded-[2rem] border border-white/70 bg-white/70 p-6 shadow-[0_20px_40px_-10px_rgba(184,0,53,.18)] backdrop-blur-2xl sm:p-8">
           <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.13em] text-rose-800"><Heart size={14} fill="currentColor"/> Intentional connections</p>
           <h1 className="mt-4 font-heading text-4xl font-semibold leading-[1.12] tracking-[-.04em] text-[#8c0026] sm:text-5xl">Find Your <br/><span className="font-light italic text-[#6f2f3a]">Intentional</span> Connection</h1>
