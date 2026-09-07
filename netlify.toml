@@ -1,0 +1,10 @@
+[build]
+command = "npm run build"
+publish = ".next"
+
+[functions]
+external_node_modules = ["sharp"]
+included_files = ["node_modules/sharp/**/*", "node_modules/@img/**/*"]
+
+[[plugins]]
+package = "@netlify/plugin-nextjs"
