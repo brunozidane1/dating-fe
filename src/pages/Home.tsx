@@ -7,18 +7,19 @@ import { Link } from "react-router-dom";
 
 const Image = "https://images.unsplash.com/";
 const discovery = [
-  { name: "Amelia", age: 29, city: "Kigali", role: "Architect", tags: ["Design", "Coffee"], src: `${Image}photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=85` },
-  { name: "Julian", age: 32, city: "Kacyiru", role: "Writer", tags: ["Literature"], src: `${Image}photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=85` },
+  { name: "Mutesi", age: 27, city: "Kigali", role: "Creative director", tags: ["Culture", "Music"], src: "/lume-3.jpg" },
+  { name: "Ntwari", age: 31, city: "Kacyiru", role: "Software engineer", tags: ["Travel", "Literature"], src: "/lume-2.jpg" },
 ];
 const steps = [
-  { title: "Curate", copy: "Craft your narrative through the details, photographs, and prompts that show the person behind the profile.", src: `${Image}photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=800&q=85` },
+  { title: "Curate", copy: "Craft your narrative through the details, photographs, and prompts that show the person behind the profile.", src: "/editorial-1 (1).jpg" },
   { title: "Connect", copy: "Discover resonance through shared values, aesthetics, and relationship goals—not just proximity.", src: `${Image}photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=800&q=85` },
-  { title: "Converse", copy: "Limited active chats help every message carry more weight and leave room for genuine dialogue.", src: `${Image}photo-1524250502761-1ac6f2e30d43?auto=format&fit=crop&w=800&q=85` },
+  { title: "Converse", copy: "Limited active chats help every message carry more weight and leave room for genuine dialogue.", src: "/editorial-3 (1).jpg" },
 ];
+steps[1].src = "/editorial-2 (1).jpg";
 const testimonials = [
-  { name: "Marcus, 34", quote: "Finally, a place where intention matters more than attention.", src: `${Image}photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=85`, rotate: "-rotate-2" },
-  { name: "Elena, 29", quote: "The three-chat limit completely changed how I connect. I'm actually getting to know people again.", src: `${Image}photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=85`, rotate: "rotate-2 md:mt-16" },
-  { name: "David, 41", quote: "It feels like an exclusive members club, but for romance. Highly curated.", src: `${Image}photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=85`, rotate: "-rotate-1 md:mt-32" },
+  { name: "Mugabo & Mutesi", quote: "Finally, a place where intention matters more than attention.", src: "/curated-1 (1).jpg", rotate: "-rotate-2" },
+  { name: "Niyonzima & Aline", quote: "The three-chat limit completely changed how we connect. We're actually getting to know each other again.", src: "/curated-2 (1).jpg", rotate: "rotate-2 md:mt-16" },
+  { name: "Kagabo & Uwase", quote: "It feels like a thoughtful community, made for romance.", src: "/hero.jpg", rotate: "-rotate-1 md:mt-32" },
 ];
 const floatingHearts = [
   { left: "7%", top: "2%", size: 20, delay: "-1s", duration: "9s" },
@@ -42,7 +43,31 @@ const floatingHearts = [
 ];
 
 export default function Home() {
-  useEffect(() => { AOS.init({ duration: 650, once: true, offset: 45, easing: "ease-out-cubic" }); }, []);
+  useEffect(() => {
+    AOS.init({ duration: 650, once: true, offset: 45, easing: "ease-out-cubic" });
+    const localImages: Record<string, string> = {
+      "Couple sharing an intimate moment": "/hero.jpg",
+      Sophia: "/lume-1.jpg",
+      "Active match": "/editorial-2 (1).jpg",
+    };
+    Object.entries(localImages).forEach(([alt, src]) => {
+      const image = document.querySelector<HTMLImageElement>(`img[alt="${alt}"]`);
+      if (image) image.src = src;
+    });
+    const replacements: Record<string, string> = {
+      Sophia: "Aline",
+      "Amelia & Julian": "Mutesi & Ntwari",
+      Lume: "Lovinara",
+    };
+    const textWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let node = textWalker.nextNode();
+    while (node) {
+      for (const [from, to] of Object.entries(replacements)) {
+        if (node.nodeValue?.includes(from)) node.nodeValue = node.nodeValue.replaceAll(from, to);
+      }
+      node = textWalker.nextNode();
+    }
+  }, []);
   return <div className="home-page relative w-full max-w-full overflow-x-hidden bg-[#f7f9fb] text-[#191c1e] font-body">
     <div className="home-hearts" aria-hidden="true">{floatingHearts.map((heart, index) => <span key={index} className="home-heart" style={{ left: heart.left, top: heart.top, "--heart-delay": heart.delay, "--heart-duration": heart.duration } as React.CSSProperties}><Heart size={heart.size} fill="currentColor" strokeWidth={1.5}/></span>)}</div>
     <section className="relative flex min-h-[630px] items-center overflow-hidden md:min-h-[680px]">

@@ -78,6 +78,9 @@ export interface Message {
   status: "sending" | "sent" | "delivered" | "read" | "failed";
   createdAt: string;
   readAt?: string;
+  mimeType?: string;
+  attachmentUrl?: string;
+  attachmentType?: "image" | "file" | "none";
 }
 
 export interface Conversation {
@@ -103,5 +106,6 @@ export interface NotificationItem {
 export interface AuthResponse {
   token: string;
   user: UserProfile;
-  subscription: Subscription;
+  requiresProfileCompletion?: boolean;
+  subscription?: Subscription;
 }

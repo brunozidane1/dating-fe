@@ -34,11 +34,7 @@ export const profilesService = {
   async uploadPhoto(file: File): Promise<{ url: string }> {
     const form = new FormData();
     form.append("file", file);
-    const { data } = await api.post<{ url: string }>(
-      "/profiles/me/photos",
-      form,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
+    const { data } = await api.post<{ url: string }>("/profiles/me/photos", form);
     return data;
   },
 

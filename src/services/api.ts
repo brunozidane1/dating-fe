@@ -1,12 +1,12 @@
 import axios from "axios";
 
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000/api";
+  import.meta.env.VITE_API_BASE_URL ?? "https://dating-be-1.onrender.com/api";
 
 export const SOCKET_URL =
-  import.meta.env.VITE_SOCKET_URL ?? "http://localhost:4000";
+  import.meta.env.VITE_SOCKET_URL ?? API_BASE_URL.replace(/\/api\/?$/, "");
 
-export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
+export const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
 const TOKEN_KEY = "lume_token";
 
