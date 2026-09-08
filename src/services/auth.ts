@@ -48,7 +48,7 @@ export const authService = {
 
   async completeProfile(payload: {
     age: number; gender: string; location: string; occupation: string; education: string;
-    datingPreferences: string[]; relationshipGoals: string[]; loveLanguages: string[];
+    datingPreferences: string[]; relationshipGoals: string[]; loveLanguages: string[]; bio: string; interests: string[];
   }): Promise<AuthResponse> {
     const { data } = await api.put<AuthResponse>("/auth/complete-profile", payload);
     return data;

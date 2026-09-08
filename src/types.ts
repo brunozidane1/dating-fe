@@ -1,4 +1,4 @@
-export type PlanTier = "free" | "basic" | "classic" | "premium";
+export type PlanTier = "free" | "basic" | "premium";
 
 export interface Subscription {
   id: string;
@@ -12,6 +12,7 @@ export interface Subscription {
 export interface UserProfile {
   id: string;
   name: string;
+  role?: "user" | "admin";
   email?: string;
   phone?: string;
   dob?: string;
@@ -32,6 +33,20 @@ export interface UserProfile {
   online?: boolean;
   age?: number;
   profilePercent?: number;
+  profile?: {
+    age?: number;
+    gender?: string;
+    location?: string;
+    datingPreferences?: string[];
+    relationshipGoals?: string[];
+    occupation?: string;
+    education?: string;
+    loveLanguages?: string[];
+    bio?: string;
+    interests?: string[];
+    lifestyle?: string[];
+    photos?: string[];
+  };
   createdAt: string;
 }
 
@@ -108,4 +123,57 @@ export interface AuthResponse {
   user: UserProfile;
   requiresProfileCompletion?: boolean;
   subscription?: Subscription;
+}
+
+export interface AdminOverviewMetrics {
+  totalUsers: number;
+  activeUsers: number;
+  completeProfiles: number;
+  profileCompletionRate: number;
+  newUsersLast30Days: number;
+  totalMessages: number;
+  totalMatches: number;
+  pendingRequests: number;
+}
+
+export interface AdminOverviewResponse {
+  metrics: AdminOverviewMetrics;
+  recentUsers: AdminUserSummary[];
+}
+
+export interface AdminUserSummary extends UserProfile {
+  isActive: boolean;
+  isProfileComplete: boolean;
+}
+
+export interface AdminUsersResponse {
+  users: AdminUserSummary[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+export interface AdminConnectionRequestItem {
+  id: string;
+  status: "pending" | "accepted" | "declined" | "ended";
+  createdAt: string;
+  requester: AdminUserSummary;
+  recipient: AdminUserSummary;
+}
+
+export interface AdminMatchItem {
+  id: string;
+  pairKey: string;
+  matchPercentage: number;
+  matchedAt: string;
+  users: AdminUserSummary[];
+}
+
+export interface AdminActivityResponse {
+  recentUsers: AdminUserSummary[];
+  connectionRequests: AdminConnectionRequestItem[];
+  recentMatches: AdminMatchItem[];
 }

@@ -17,10 +17,29 @@ import { getSessionUser, setSessionUser } from "../services/session";
 import { authService } from "../services/auth";
 import { api, toApiError } from "../services/api";
 import { messagesService } from "../services/messages";
-import { acknowledgeDelivered, acknowledgeRead, subscribeToChat, subscribeToPresence, type SocketChatMessage, type SocketChatStatus } from "../services/chat-socket";
+import { acknowledgeDelivered, acknowledgeRead, subscribeToChat, subscribeToConversationRemoval, subscribeToPresence, type SocketChatMessage, type SocketChatStatus } from "../services/chat-socket";
+import { plansService } from "../services/plans";
 
 type Toast = { message: string; tone?: "rose" | "emerald" } | null;
 const CHAT_EMOJIS = ["😀", "😊", "😍", "🥰", "😂", "😉", "❤️", "🔥", "👍", "🎉", "✨", "🙌"];
+const DISCOVER_HEARTS = [
+  { left: "8%", top: "4%", size: 15, delay: "-1s", duration: "9s" },
+  { left: "79%", top: "5%", size: 20, delay: "-5s", duration: "11s" },
+  { left: "46%", top: "11%", size: 14, delay: "-3s", duration: "10s" },
+  { left: "92%", top: "17%", size: 17, delay: "-6s", duration: "10s" },
+  { left: "15%", top: "22%", size: 12, delay: "-2s", duration: "8s" },
+  { left: "66%", top: "28%", size: 23, delay: "-7s", duration: "12s" },
+  { left: "35%", top: "35%", size: 13, delay: "-4s", duration: "9s" },
+  { left: "88%", top: "41%", size: 18, delay: "-8s", duration: "11s" },
+  { left: "6%", top: "47%", size: 19, delay: "-3s", duration: "12s" },
+  { left: "58%", top: "53%", size: 12, delay: "-6s", duration: "8s" },
+  { left: "24%", top: "59%", size: 16, delay: "-2s", duration: "10s" },
+  { left: "76%", top: "66%", size: 20, delay: "-5s", duration: "11s" },
+  { left: "41%", top: "73%", size: 13, delay: "-7s", duration: "9s" },
+  { left: "95%", top: "79%", size: 18, delay: "-1s", duration: "12s" },
+  { left: "11%", top: "85%", size: 15, delay: "-4s", duration: "10s" },
+  { left: "62%", top: "92%", size: 21, delay: "-8s", duration: "11s" },
+];
 const PageTitle = ({ title, copy, action }: { title: string; copy: string; action?: ReactNode }) => <div className="page-heading"><div><p className="kicker">Lume / {title}</p><h1>{title}</h1><p>{copy}</p></div>{action}</div>;
 const Online = () => <span className="online-dot" aria-label="Online"/>;
 function IconAction({ label, children, onClick, busy = false, disabled = false, tone = "light" }: { label: string; children: ReactNode; onClick?: () => void; busy?: boolean; disabled?: boolean; tone?: "light" | "rose" | "dark" }) {
@@ -64,6 +83,17 @@ export function DiscoverPage() {
   return (
     <section className="app-page discover-page relative z-10 !max-w-[1600px] !px-[20px] !pb-16 !pt-2 md:!px-[40px]">
       <ToastNotice toast={toast}/>
+      <div className="discover-hearts" aria-hidden="true">
+        {DISCOVER_HEARTS.map((heart, index) => (
+          <span
+            key={index}
+            className="discover-heart"
+            style={{ left: heart.left, top: heart.top, "--heart-delay": heart.delay, "--heart-duration": heart.duration } as React.CSSProperties}
+          >
+            <Heart size={heart.size} fill="currentColor" strokeWidth={1.5}/>
+          </span>
+        ))}
+      </div>
       <section className="mobile-discover-native" aria-label="Discover members">
         <div className="mobile-discover-head"><h1>Discover</h1><button onClick={() => setFilterOpen(true)}><Filter size={14}/> Filters</button></div>
         <div className="mobile-discover-list">{filtered.map((person) => <Link to={`/profiles/${person.id}`} className="mobile-discover-card" key={person.id}><img src={person.primaryPhoto} alt={`${person.name}'s profile`}/><div><span>{person.online ? "Online now" : "Active recently"}</span><h2>{person.name}, {person.age} {person.verified && <ShieldCheck size={14}/>}</h2><p><MapPin size={13}/>{person.location} · {person.distance} km away</p><small>{person.matchScore.overall}% match · {person.occupation}</small></div></Link>)}</div>
@@ -174,7 +204,11 @@ export function ProfileDetailPage() {
       <article className="profile-glass rounded-2xl p-4 md:col-span-2"><h3 className="text-[10px] font-bold uppercase tracking-[.14em] text-[#565e74]">Passions & interests</h3><div className="mt-3 flex flex-wrap gap-1.5">{[...(person.interests ?? []), ...lifestyle.slice(1)].map((item) => <span key={item} className="rounded-full bg-[#8c0026]/10 px-2.5 py-1 text-[10px] font-semibold text-[#8c0026]">{item}</span>)}</div></article>
     </section>
     {photos.length > 0 && <section className="mt-4 grid grid-cols-2 gap-3">{photos.map((src) => <img key={src} src={src} alt={`${person.name}'s gallery`} className="h-40 w-full rounded-2xl object-cover shadow-sm sm:h-56"/>)}</section>}
-    <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-[#e4bdbe]/30 bg-white/80 p-3 pb-6 backdrop-blur md:hidden"><button onClick={() => setLiked(false)} className="flex flex-1 items-center justify-center gap-1 rounded-full bg-[#e6e8ea] py-2 text-[11px] font-bold text-[#191c1e]"><X size={15}/>Pass</button><button onClick={() => setLiked(true)} className="flex flex-1 items-center justify-center gap-1 rounded-full bg-gradient-to-r from-[#8c0026] to-[#b80035] py-2 text-[11px] font-bold text-white"><Heart size={15} fill="currentColor"/>{liked ? "Liked" : "Like"}</button></div>
+    <div className="fixed inset-x-0 bottom-0 z-40 flex gap-1.5 border-t border-[#e4bdbe]/30 bg-white/80 p-3 pb-6 backdrop-blur md:hidden">
+      <button onClick={() => void act("pass")} className="flex flex-1 items-center justify-center gap-1 rounded-full bg-[#e6e8ea] py-2 text-[11px] font-bold text-[#191c1e]"><X size={15}/>Pass</button>
+      <button onClick={() => void act("connect")} className="flex flex-1 items-center justify-center gap-1 rounded-full bg-[#f2f4f6] py-2 text-[11px] font-bold text-[#8c0026]"><UserPlus size={15}/>Connect</button>
+      <button onClick={() => void act("like")} className="flex flex-1 items-center justify-center gap-1 rounded-full bg-gradient-to-r from-[#8c0026] to-[#b80035] py-2 text-[11px] font-bold text-white"><Heart size={15} fill="currentColor"/>{liked ? "Liked" : "Like"}</button>
+    </div>
   </section>;
 }
 export function MatchesPage() {
@@ -530,6 +564,14 @@ export function MessagesShell() {
     },
     (status: SocketChatStatus) => setConversations((items) => items.map((conversation) => ({ ...conversation, messages: conversation.messages.map((message) => message.id === status.messageId ? { ...message, status: status.status, readAt: status.readAt ?? message.readAt } : message) }))),
   ), [selectedId]);
+  useEffect(() => subscribeToConversationRemoval((update) => {
+    if (!update.otherUserId) return;
+    setConversations((items) => items.filter((conversation) => conversation.user.id !== update.otherUserId));
+    setSelectedId((current) => {
+      const currentConversation = conversations.find((item) => item.id === current);
+      return currentConversation?.user.id === update.otherUserId ? null : current;
+    });
+  }), [conversations]);
   useEffect(() => subscribeToPresence(
     ({ userId, online, lastActive }) => setConversations((items) => items.map((item) => item.user.id === userId ? { ...item, user: { ...item.user, online, lastActive: lastActive ?? item.user.lastActive } } : item)),
     (onlineUserIds) => setConversations((items) => items.map((item) => ({ ...item, user: { ...item.user, online: onlineUserIds.includes(item.user.id) } }))),
@@ -664,11 +706,12 @@ function StudioTitle({ icon, title, action }: { icon: ReactNode; title: string; 
 function StudioField({ label, value, wide = false, onChange }: { label: string; value: string; wide?: boolean; onChange?: (value: string) => void }) { return <label className={wide ? "studio-field studio-field-wide" : "studio-field"}><span>{label}</span><input value={value} onChange={(event) => onChange?.(event.target.value)}/></label>; }
 
 export function PricingPage() {
-  const [selected, setSelected] = useState("standard");
+  void plansService;
+  const [selected, setSelected] = useState("free");
   const plans = [
-    { id: "standard", name: "Lume Standard", price: "Free", description: "For casual discovery", label: "Included", features: ["Curated daily matches", "Basic discovery filters", "Limited daily likes"] },
-    { id: "premium", name: "Lume Premium", price: "$24.99", description: "For intentional connection", label: "Everything in Standard, plus:", features: ["Unlimited likes & undo", "Advanced relationship filters", "See who liked you instantly", "Incognito mode browsing"], featured: true, slots: "3" },
-    { id: "elite", name: "Lume Elite", price: "$49.99", description: "For maximum visibility", label: "Everything in Premium, plus:", features: ["Profile highlighted in Discovery", "Dedicated concierge support"], slots: "7" },
+    { id: "free", name: "Free", price: "UGX 0", description: "Message up to 2 different people before upgrading.", label: "Included", features: ["Browse discovery and home", "Send messages to 2 different people", "Complete profile with bio and interests"] },
+    { id: "basic", name: "Basic", price: "UGX 6,000", description: "Keep your circle to 3 active connections.", label: "Everything in Free, plus:", features: ["Connect with up to 3 people", "Priority discovery visibility", "Everything from the Free plan"], featured: true, slots: "3" },
+    { id: "premium", name: "Premium", price: "UGX 10,000", description: "Unlimited access everywhere.", label: "Everything in Basic, plus:", features: ["Unlimited connections and chats", "Unlimited discovery visibility", "Everything from the Basic plan"], slots: "Unlimited" },
   ];
   return <section className="pricing-page">
     <div className="pricing-intro">
@@ -679,10 +722,10 @@ export function PricingPage() {
     <div className="pricing-plans">
       {plans.map((plan) => <article className={`pricing-plan ${plan.featured ? "pricing-plan-featured" : ""}`} key={plan.id}>
         {plan.featured && <span className="pricing-popular">Most popular</span>}
-        <div className="pricing-plan-head"><h2>{plan.name}</h2><div className="pricing-price">{plan.price}{plan.price !== "Free" && <small>/mo</small>}</div><p>{plan.description}</p></div>
-        {plan.slots && <div className="pricing-slots"><div><span>The slot system</span><b>Priority Connections</b></div><strong>{plan.slots}<small>/wk</small></strong><div className="pricing-slot-bars">{Array.from({ length: plan.id === "elite" ? 5 : 3 }).map((_, i) => <i key={i}/>)}</div>{plan.featured && <p>Intentional scarcity ensures your interest signals genuine intent.</p>}</div>}
+        <div className="pricing-plan-head"><h2>{plan.name}</h2><div className="pricing-price">{plan.price}{plan.id !== "free" && <small>/mo</small>}</div><p>{plan.description}</p></div>
+        {plan.slots && <div className="pricing-slots"><div><span>Connection limit</span><b>{plan.id === "premium" ? "Unlimited everywhere" : "Up to 3 people"}</b></div><strong>{plan.slots}</strong><div className="pricing-slot-bars">{Array.from({ length: plan.id === "premium" ? 5 : 3 }).map((_, i) => <i key={i}/>)}</div>{plan.featured && <p>Intentional scarcity ensures your interest signals genuine intent.</p>}</div>}
         <div className="pricing-features"><span>{plan.label}</span><ul>{plan.features.map((feature) => <li key={feature}><Check size={16}/>{feature}</li>)}</ul></div>
-        <button onClick={() => setSelected(plan.id)} className={plan.featured ? "pricing-cta pricing-cta-featured" : "pricing-cta"}>{selected === plan.id ? "Current plan" : plan.id === "standard" ? "Current plan" : `Upgrade to ${plan.id === "premium" ? "Premium" : "Elite"}`}</button>
+        <button onClick={() => setSelected(plan.id)} className={plan.featured ? "pricing-cta pricing-cta-featured" : "pricing-cta"}>{selected === plan.id ? "Current plan" : plan.id === "free" ? "Stay on Free" : `Prepare ${plan.name}`}</button>
       </article>)}
     </div>
     <section className="pricing-benefits"><h2>The Premium Experience</h2><div>{[[ShieldCheck, "Verified Authenticity", "Connect with confidence knowing our premium members undergo rigorous profile verification."], [HeartPulse, "Curated Excellence", "Our algorithm learns your preferences, presenting the most compatible matches."], [MessageCircle, "Concierge Support", "Enjoy priority access to our dedicated support team whenever you need it."]].map(([Icon, title, copy]) => { const BenefitIcon = Icon as typeof ShieldCheck; return <article key={title as string}><span><BenefitIcon size={20}/></span><h3>{title as string}</h3><p>{copy as string}</p></article>; })}</div></section>
@@ -721,6 +764,11 @@ export function ChatPage() {
     },
     (status) => setMessages((items) => items.map((message) => message.id === status.messageId ? { ...message, status: status.status, readAt: status.readAt ?? message.readAt } : message)),
   ), [id]);
+  useEffect(() => subscribeToConversationRemoval((update) => {
+    if (update.otherUserId !== id) return;
+    setPerson(null);
+    setMessages([]);
+  }), [id]);
   if (loading) return <section className="app-page"><LoadingState label="Loading conversation…"/></section>;
   if (!person) return <section className="app-page"><Empty icon={MessageCircle} title="No active conversation" copy="Messages are only available with people you’re actively connected to." cta={<Link className="button button-primary" to="/messages">Back to messages</Link>}/></section>;
   const send = async (event: FormEvent) => {

@@ -21,6 +21,7 @@ export type SocketChatStatus = {
   readAt?: string;
 };
 export type PresenceUpdate = { userId: string; online: boolean; lastActive?: string };
+export type ConversationRemovedUpdate = { pairKey?: string; connectionId?: string; otherUserId?: string };
 
 let socket: Socket | null = null;
 
@@ -59,6 +60,13 @@ export function subscribeToPresence(onUpdate: (update: PresenceUpdate) => void, 
   client.on("presence:update", onUpdate);
   client.on("presence:snapshot", snapshot);
   return () => { client.off("presence:update", onUpdate); client.off("presence:snapshot", snapshot); };
+}
+
+export function subscribeToConversationRemoval(onRemove: (update: ConversationRemovedUpdate) => void) {
+  const client = getChatSocket();
+  if (!client) return () => {};
+  client.on("chat:conversation-removed", onRemove);
+  return () => { client.off("chat:conversation-removed", onRemove); };
 }
 
 export function acknowledgeDelivered(messageId: string) {

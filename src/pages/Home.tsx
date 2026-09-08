@@ -40,6 +40,12 @@ const floatingHearts = [
   { left: "66%", top: "83%", size: 23, delay: "-8s", duration: "11s" },
   { left: "31%", top: "89%", size: 13, delay: "-6s", duration: "8s" },
   { left: "86%", top: "95%", size: 19, delay: "-3s", duration: "10s" },
+  { left: "18%", top: "6%", size: 12, delay: "-7s", duration: "9s" },
+  { left: "74%", top: "18%", size: 21, delay: "-4s", duration: "12s" },
+  { left: "41%", top: "24%", size: 15, delay: "-9s", duration: "11s" },
+  { left: "5%", top: "58%", size: 18, delay: "-5s", duration: "9s" },
+  { left: "62%", top: "72%", size: 14, delay: "-2s", duration: "10s" },
+  { left: "48%", top: "98%", size: 17, delay: "-6s", duration: "12s" },
 ];
 
 export default function Home() {
