@@ -88,13 +88,13 @@ export default function Header() {
       </header>
 
       {/* Mobile Top Header (page title) */}
-      <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-center border-b border-[#e4bdbe]/20 bg-white/80 px-3 backdrop-blur-md md:hidden">
+      <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-start border-b border-[#e4bdbe]/20 bg-white/80 px-3 backdrop-blur-md md:hidden">
         {pathname === "/" ? <Link to="/" className="site-logo site-logo-mobile" aria-label="Lovinara home"><img src="/logo.jpeg" alt="Lovinara" /></Link> : <span style={headline} className="text-2xl font-bold tracking-[-0.02em] text-[#8c0026]">{title}</span>}
         <div className="absolute right-3">{accountControl}</div>
       </header>
 
       {/* Mobile Bottom Navigation (reference style) */}
-      {user && <nav className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around rounded-t-lg border-t border-[#e4bdbe]/20 bg-white/60 px-4 pb-8 pt-4 shadow-[0_-8px_30px_rgba(184,0,53,0.1)] backdrop-blur-xl md:hidden" aria-label="Mobile primary navigation">
+      {user && <nav className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-between rounded-t-lg border-t border-[#e4bdbe]/20 bg-white/60 px-4 pb-8 pt-4 shadow-[0_-8px_30px_rgba(184,0,53,0.1)] backdrop-blur-xl md:hidden" aria-label="Mobile primary navigation">
         {nav.map(({ label, to, icon }) => (
           <NavLink key={to} to={to} end={to === "/"} className={({ isActive }) => `flex min-w-0 flex-col items-center justify-center transition-transform duration-300 ease-out ${isActive ? "scale-105 text-[#8c0026]" : "text-[#3e465b] opacity-60 hover:text-[#8c0026]"}`}>
             {({ isActive }) => (

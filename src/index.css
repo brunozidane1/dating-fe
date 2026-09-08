@@ -219,8 +219,15 @@ textarea:focus-visible {
 .search-results-count { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 700; }
 
 /* Standalone chat (dedicated conversation view) */
-.chat-standalone { display: flex; flex-direction: column; min-height: calc(100vh - 145px); margin-top: 6px; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: 0 2px 8px rgba(184,0,53,.05), 0 10px 24px rgba(15,23,42,.06); }
-.chat-standalone .chat-messages { min-height: 380px; }
+/* The wrapper is <section class="app-page messages-page">. Override the generic
+   .app-page sizing so the chat always fills the viewport below the sticky header
+   (80px on desktop, 64px on mobile) and only the message list scrolls internally. */
+.messages-page { min-height: 0; height: calc(100vh - 80px); padding: 0; overflow: hidden; }
+@media (max-width: 767px) { .messages-page { height: calc(100vh - 64px); } }
+.chat-standalone { display: flex; flex-direction: column; height: 100%; margin-top: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: 0 2px 8px rgba(184,0,53,.05), 0 10px 24px rgba(15,23,42,.06); }
+.chat-standalone .chat-head { flex-shrink: 0; }
+.chat-standalone .chat-messages { flex: 1; min-height: 0; overflow-y: auto; }
+.chat-standalone .chat-compose { flex-shrink: 0; }
 
 /* Selectable chip (toggle chips used on profiles / complete profile) */
 .chip-toggle { cursor: pointer; user-select: none; transition: .15s ease; border: 1px solid transparent; }
@@ -318,10 +325,10 @@ textarea:focus-visible {
 .button[disabled] { opacity: .55; pointer-events: none; }
 
 /* === Messages: three-panel reference messenger === */
-.messages-page-full { position: relative; max-width: 1600px; margin: 0 auto; height: calc(100vh - 58px); overflow: hidden; background: var(--surface, #fff); }
+.messages-page-full { position: relative; max-width: 1600px; margin: 0 auto; height: calc(100vh - 80px); overflow: hidden; background: var(--surface, #fff); }
 .messenger3 { display: grid; grid-template-columns: 348px minmax(0, 1fr); height: 100%; min-height: 0; }
 @media (min-width: 1280px) { .messenger3 { grid-template-columns: 348px minmax(0, 1fr) 320px; } }
-@media (max-width: 768px) { .messages-page-full { height: calc(100vh - 54px); } .messenger3 { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 768px) { .messages-page-full { height: calc(100vh - 64px); } .messenger3 { grid-template-columns: minmax(0, 1fr); } }
 
 /* Conversation sidebar */
 .conv3 { display: flex; flex-direction: column; min-height: 0; background: #fff; border-right: 1px solid var(--line); }
@@ -366,6 +373,8 @@ textarea:focus-visible {
 .chat3-stream { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 1; }
 .chat3-day { text-align: center; margin: 4px 0 10px; }
 .chat3-day span { display: inline-block; padding: 4px 12px; border-radius: 999px; background: rgba(224, 227, 229, .6); backdrop-filter: blur(6px); color: #64748b; font-size: 10px; font-weight: 700; }
+.chat-day { text-align: center; margin: 4px 0 10px; }
+.chat-day span { display: inline-block; padding: 4px 12px; border-radius: 999px; background: rgba(224, 227, 229, .6); color: #64748b; font-size: 10px; font-weight: 700; }
 .chat3-row { display: flex; gap: 8px; align-items: flex-end; max-width: 85%; }
 .chat3-row.out { justify-content: flex-end; flex-direction: row-reverse; margin-left: auto; }
 .chat3-row .ava { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex: none; align-self: flex-end; }

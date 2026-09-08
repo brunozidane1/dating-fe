@@ -26,7 +26,7 @@ function Shell() {
       <Route path="plans" element={<AdminPlansPage />} />
     </Route><Route path="/login" element={<ConnectedLoginPage />} /><Route path="/signup" element={<ConnectedSignupPage />} /><Route path="/forgot-password" element={<ForgotPasswordPage />} />
     {['about', 'safety', 'help', 'contact', 'guidelines', 'privacy', 'terms', 'cookies'].map((page) => <Route key={page} path={`/${page}`} element={<InfoPage page={page}/>} />)}<Route path="*" element={<InfoPage page="help" />} />
-  </Routes></main>{!auth && !admin && !messenger && <Footer/>}{!admin && <div className="help-widget">{helpOpen && <aside className="help-popover"><button onClick={() => setHelpOpen(false)} aria-label="Close help"><X size={15}/></button><strong>Need a hand?</strong><p>Contact the Lovinara team directly.</p><p><b>Email:</b> info@lovinara.com</p><p><b>Phone:</b> 0788765430</p></aside>}<button className="help-toggle" onClick={() => setHelpOpen(!helpOpen)} aria-expanded={helpOpen} aria-label="Open help"><CircleHelp size={20}/><span>Help</span></button></div>}</>;
+  </Routes></main>{!auth && !admin && !messenger && <Footer/>}{!admin && !messenger && <div className="help-widget">{helpOpen && <aside className="help-popover"><button onClick={() => setHelpOpen(false)} aria-label="Close help"><X size={15}/></button><strong>Need a hand?</strong><p>Contact the Lovinara team directly.</p><p><b>Email:</b> info@lovinara.com</p><p><b>Phone:</b> 0788765430</p></aside>}<button className="help-toggle" onClick={() => setHelpOpen(!helpOpen)} aria-expanded={helpOpen} aria-label="Open help"><CircleHelp size={20}/><span>Help</span></button></div>}</>;
 }
 function App() {
   return <BrowserRouter><Shell /></BrowserRouter>;
