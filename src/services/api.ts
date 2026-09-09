@@ -12,6 +12,7 @@ const TOKEN_KEY = "lume_token";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 20_000,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -65,7 +66,7 @@ export function toApiError(err: unknown): ApiError {
       | { message?: string; code?: string }
       | undefined;
     return new ApiError(
-      data?.message ?? err.message ?? "Something went wrong",
+      data?.message ?? (err.code === "ECONNABORTED" ? "The server took too long to respond. Please try again." : err.message) ?? "Something went wrong",
       err.response?.status,
       data?.code
     );
