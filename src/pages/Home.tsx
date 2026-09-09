@@ -101,7 +101,7 @@ export default function Home() {
       <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center px-5 py-24 md:px-10">
         <div data-aos="fade-right" className="relative w-full max-w-[490px] rounded-[2rem] border border-white/70 bg-white/70 p-6 shadow-[0_20px_40px_-10px_rgba(184,0,53,.18)] backdrop-blur-2xl sm:p-8">
           <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.13em] text-rose-800"><Heart size={14} fill="currentColor"/> Intentional connections</p>
-          <h1 className="mt-4 font-heading text-4xl font-semibold leading-[1.12] tracking-[-.04em] text-[#8c0026] sm:text-5xl">Find Your <br/><span className="font-light italic text-[#6f2f3a]">Intentional</span> Connection</h1>
+          <h1 className="mt-4 font-heading text-4xl font-semibold leading-[1.12] tracking-[-.04em] text-[#8c0026] sm:text-5xl">Find Your <br/><span className="font-light italic text-[#6f2f3a]">Intentional</span> Connection Uganda</h1>
           <p className="mt-5 max-w-md text-sm leading-7 text-[#5b4041] sm:text-base">Step away from endless swiping. Lume is a curated space for meaningful, sophisticated romance.</p>
           <Link to="/signup" className="mt-7 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#8c0026] to-[#b80035] px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_25px_-12px_rgba(184,0,53,.8)] transition hover:opacity-90 active:scale-95">Begin journey <ArrowRight size={16}/></Link>
           <article data-aos="zoom-in" data-aos-delay="350" className="absolute -bottom-24 left-4 z-10 w-64 rounded-2xl border border-white/70 bg-white/75 p-3 shadow-[0_20px_40px_-10px_rgba(184,0,53,.2)] backdrop-blur-2xl sm:-right-20 sm:bottom-10 sm:left-auto">

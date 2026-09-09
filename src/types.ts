@@ -29,10 +29,12 @@ export interface UserProfile {
   photos?: string[];
   primaryPhoto?: string;
   verified?: boolean;
+isEmailVerified?: boolean;
   lastActive?: string;
   online?: boolean;
   age?: number;
   profilePercent?: number;
+  isProfileComplete?: boolean;
   profile?: {
     age?: number;
     gender?: string;
@@ -122,6 +124,7 @@ export interface AuthResponse {
   token: string;
   user: UserProfile;
   requiresProfileCompletion?: boolean;
+  requiresEmailVerification?: boolean;
   subscription?: Subscription;
 }
 

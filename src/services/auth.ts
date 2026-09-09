@@ -1,5 +1,5 @@
 import { api, clearToken, setToken } from "./api";
-import type { AuthResponse } from "../types";
+import type { AuthResponse, UserProfile } from "../types";
 
 const MAX_PROFILE_PHOTO_BYTES = 10 * 1024 * 1024;
 
@@ -74,6 +74,16 @@ export const authService = {
       "/auth/reset-password",
       { token, password }
     );
+    return data;
+  },
+
+  async verifyEmail(token: string): Promise<{ message: string; user: UserProfile }> {
+    const { data } = await api.post<{ message: string; user: UserProfile }>("/auth/verify-email", { token });
+    return data;
+  },
+
+  async resendVerification(email: string): Promise<{ message: string }> {
+    const { data } = await api.post<{ message: string }>("/auth/resend-verification", { email });
     return data;
   },
 

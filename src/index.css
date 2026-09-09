@@ -230,6 +230,9 @@ textarea:focus-visible {
 .chat-standalone .chat-compose { flex-shrink: 0; }
 
 /* Selectable chip (toggle chips used on profiles / complete profile) */
+.choice-chips label { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #e4bdbe; border-radius: 999px; padding: 8px 11px; background: #fff; color: #5b4041; font-size: 10px; font-weight: 700; transition: .18s ease; cursor: pointer; }
+.choice-chips label:hover { border-color: #b80035; }
+.choice-chips label.selected { border-color: #8c0026; background: #8c0026; color: #fff; box-shadow: 0 7px 14px -10px rgba(140,0,38,.8); }
 .chip-toggle { cursor: pointer; user-select: none; transition: .15s ease; border: 1px solid transparent; }
 .chip-toggle:hover { border-color: #ffc9d1; color: var(--rose-deep); }
 .chip-toggle.selected { color: #fff; background: linear-gradient(90deg,var(--rose-deep),var(--rose-deep2)); box-shadow: 0 8px 16px -8px rgba(184,0,53,.55); }

@@ -7,15 +7,16 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Footer from "./components/Footer";
 import "./index.css"
 import Home from "./pages/Home";
-import { ForgotPasswordPage } from "./pages/AuthPages";
+import { ForgotPasswordPage, ResetPasswordPage } from "./pages/ResetPasswordPages";
 import { ConnectedCompleteProfilePage, ConnectedLoginPage, ConnectedSignupPage } from "./pages/ConnectedAuthPages";
+import VerifyEmailPage from "./pages/VerifyEmail";
 import { AdminActivityPage, AdminDashboardPage, AdminLayout, AdminPlansPage, AdminUsersPage } from "./pages/AdminPages";
 import { ChatPage, ConnectionsPage, DiscoverPage, EditProfilePage, InfoPage, MatchesPage, MessagesPage, NotificationsPage, PricingPage, ProfileDetailPage, ProfileStudioPage, SearchPage, SettingsPage } from "./pages/ProductPages";
 
 function Shell() {
   const { pathname } = useLocation();
   const [helpOpen, setHelpOpen] = useState(false);
-  const auth = ["/login", "/signup", "/forgot-password"].includes(pathname);
+  const auth = ["/login", "/signup", "/verify-email", "/forgot-password", "/reset-password"].includes(pathname);
   const admin = pathname.startsWith("/admin");
   const messenger = pathname === "/messages" || pathname.startsWith("/chat/");
   return <>{!auth && !admin && <Header/>}<main className="min-h-screen"><Routes>
@@ -24,7 +25,7 @@ function Shell() {
       <Route path="users" element={<AdminUsersPage />} />
       <Route path="activity" element={<AdminActivityPage />} />
       <Route path="plans" element={<AdminPlansPage />} />
-    </Route><Route path="/login" element={<ConnectedLoginPage />} /><Route path="/signup" element={<ConnectedSignupPage />} /><Route path="/forgot-password" element={<ForgotPasswordPage />} />
+    </Route><Route path="/login" element={<ConnectedLoginPage />} /><Route path="/signup" element={<ConnectedSignupPage />} /><Route path="/verify-email" element={<VerifyEmailPage />} /><Route path="/forgot-password" element={<ForgotPasswordPage />} /><Route path="/reset-password" element={<ResetPasswordPage />} />
     {['about', 'safety', 'help', 'contact', 'guidelines', 'privacy', 'terms', 'cookies'].map((page) => <Route key={page} path={`/${page}`} element={<InfoPage page={page}/>} />)}<Route path="*" element={<InfoPage page="help" />} />
   </Routes></main>{!auth && !admin && !messenger && <Footer/>}{!admin && !messenger && <div className="help-widget">{helpOpen && <aside className="help-popover"><button onClick={() => setHelpOpen(false)} aria-label="Close help"><X size={15}/></button><strong>Need a hand?</strong><p>Contact the Lovinara team directly.</p><p><b>Email:</b> info@lovinara.com</p><p><b>Phone:</b> 0788765430</p></aside>}<button className="help-toggle" onClick={() => setHelpOpen(!helpOpen)} aria-expanded={helpOpen} aria-label="Open help"><CircleHelp size={20}/><span>Help</span></button></div>}</>;
 }

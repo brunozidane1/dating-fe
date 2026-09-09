@@ -61,7 +61,13 @@ export function ConnectedLoginPage() {
       toast.success("Welcome back!");
       navigate(data.user.role === "admin" ? "/admin" : (data.requiresProfileCompletion ? "/profile/complete" : "/discover"));
     } catch (error) {
-      toast.error(message(error));
+      const apiError = toApiError(error);
+      if (apiError.code === "EMAIL_NOT_VERIFIED" || apiError.status === 403) {
+        toast.error("Please verify your email to sign in.");
+        navigate("/verify-email");
+      } else {
+        toast.error(apiError.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -244,8 +250,13 @@ export function ConnectedCompleteProfilePage() {
         loveLanguages: languagesSelected,
       });
       setSessionUser(data.user);
-      toast.success("Your profile is complete!");
-      navigate("/discover");
+      if (data.requiresEmailVerification) {
+        toast.success("Profile complete! Check your inbox to verify your email.");
+        navigate("/verify-email");
+      } else {
+        toast.success("Your profile is complete!");
+        navigate("/discover");
+      }
     } catch (error) {
       toast.error(message(error));
     } finally {
@@ -351,17 +362,18 @@ export function ConnectedCompleteProfilePage() {
             </label>
             <div className="input-group onboarding-wide">
               <span>Interests</span>
-              <div className="choice-chips">
+              <div className="choice-chips" role="group" aria-label="Interests">
                 {interestOptions.map((value) => (
-                  <button
-                    className={interests.includes(value) ? "selected" : ""}
-                    type="button"
-                    onClick={() => toggle(value, interests, setInterests)}
-                    key={value}
-                  >
+                  <label className={interests.includes(value) ? "selected" : ""} key={value}>
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      checked={interests.includes(value)}
+                      onChange={() => toggle(value, interests, setInterests)}
+                    />
                     {interests.includes(value) && <Heart size={12} fill="currentColor" />}
                     {value}
-                  </button>
+                  </label>
                 ))}
               </div>
             </div>

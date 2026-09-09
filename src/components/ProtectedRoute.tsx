@@ -12,5 +12,13 @@ export default function ProtectedRoute({ children, requireRole }: { children: Re
   if (requireRole && user.role !== requireRole) {
     return <Navigate to={user.role === "admin" ? "/admin" : "/discover"} replace />;
   }
+  // A completed profile must confirm its email before using the app.
+  if (
+    user.isProfileComplete &&
+    user.role !== "admin" &&
+    user.isEmailVerified === false
+  ) {
+    return <Navigate to="/verify-email" replace />;
+  }
   return <>{children}</>;
 }
