@@ -39,14 +39,19 @@ api.interceptors.response.use(
 );
 
 export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
+  // Session storage is cleared by the browser when the tab/window is closed.
+  // Remove the legacy persistent token so existing users are migrated safely.
+  const legacyToken = localStorage.getItem(TOKEN_KEY);
+  if (legacyToken) localStorage.removeItem(TOKEN_KEY);
+  return sessionStorage.getItem(TOKEN_KEY);
 }
 
 export function setToken(token: string) {
-  localStorage.setItem(TOKEN_KEY, token);
+  sessionStorage.setItem(TOKEN_KEY, token);
 }
 
 export function clearToken() {
+  sessionStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(TOKEN_KEY);
 }
 

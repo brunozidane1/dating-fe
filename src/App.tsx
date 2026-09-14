@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CircleHelp, X } from "lucide-react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
@@ -10,8 +10,23 @@ import Home from "./pages/Home";
 import { ForgotPasswordPage, ResetPasswordPage } from "./pages/ResetPasswordPages";
 import { ConnectedCompleteProfilePage, ConnectedLoginPage, ConnectedSignupPage } from "./pages/ConnectedAuthPages";
 import VerifyEmailPage from "./pages/VerifyEmail";
-import { AdminActivityPage, AdminDashboardPage, AdminLayout, AdminPlansPage, AdminUsersPage } from "./pages/AdminPages";
+import { AdminActivityPage, AdminDashboardPage, AdminLayout, AdminOperationsPage, AdminPlansPage, AdminUsersPage } from "./pages/AdminPages";
 import { ChatPage, ConnectionsPage, DiscoverPage, EditProfilePage, InfoPage, MatchesPage, MessagesPage, NotificationsPage, PricingPage, ProfileDetailPage, ProfileStudioPage, SearchPage, SettingsPage } from "./pages/ProductPages";
+
+function PrivacyGuard() {
+  useEffect(() => {
+    const obscure = () => document.documentElement.classList.toggle("privacy-obscured", document.visibilityState !== "visible");
+    const blockContextMenu = (event: MouseEvent) => event.preventDefault();
+    const blockSensitiveShortcuts = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && ["p", "s"].includes(event.key.toLowerCase())) event.preventDefault();
+    };
+    document.addEventListener("visibilitychange", obscure);
+    document.addEventListener("contextmenu", blockContextMenu);
+    document.addEventListener("keydown", blockSensitiveShortcuts);
+    return () => { document.removeEventListener("visibilitychange", obscure); document.removeEventListener("contextmenu", blockContextMenu); document.removeEventListener("keydown", blockSensitiveShortcuts); };
+  }, []);
+  return null;
+}
 
 function Shell() {
   const { pathname } = useLocation();
@@ -25,12 +40,13 @@ function Shell() {
       <Route path="users" element={<AdminUsersPage />} />
       <Route path="activity" element={<AdminActivityPage />} />
       <Route path="plans" element={<AdminPlansPage />} />
+      <Route path=":operation" element={<AdminOperationsPage />} />
     </Route><Route path="/login" element={<ConnectedLoginPage />} /><Route path="/signup" element={<ConnectedSignupPage />} /><Route path="/verify-email" element={<VerifyEmailPage />} /><Route path="/forgot-password" element={<ForgotPasswordPage />} /><Route path="/reset-password" element={<ResetPasswordPage />} />
     {['about', 'safety', 'help', 'contact', 'guidelines', 'privacy', 'terms', 'cookies'].map((page) => <Route key={page} path={`/${page}`} element={<InfoPage page={page}/>} />)}<Route path="*" element={<InfoPage page="help" />} />
   </Routes></main>{!auth && !admin && !messenger && <Footer/>}{!admin && !messenger && <div className="help-widget">{helpOpen && <aside className="help-popover"><button onClick={() => setHelpOpen(false)} aria-label="Close help"><X size={15}/></button><strong>Need a hand?</strong><p>Contact the Lovinara team directly.</p><p><b>Email:</b> info@lovinara.com</p><p><b>Phone:</b> 0788765430</p></aside>}<button className="help-toggle" onClick={() => setHelpOpen(!helpOpen)} aria-expanded={helpOpen} aria-label="Open help"><CircleHelp size={20}/><span>Help</span></button></div>}</>;
 }
 function App() {
-  return <BrowserRouter><Shell /></BrowserRouter>;
+  return <BrowserRouter><PrivacyGuard /><Shell /></BrowserRouter>;
 }
 
 export default App;

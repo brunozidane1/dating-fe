@@ -6,11 +6,13 @@ import {
   BadgeCheck,
   ChevronRight,
   CreditCard,
+  Download,
   LayoutDashboard,
   LoaderCircle,
   LogOut,
   Menu,
   Search,
+  AlertTriangle,
   ShieldCheck,
   ShieldOff,
   Users,
@@ -29,7 +31,7 @@ import type {
   AdminMatchItem,
   AdminOverviewResponse,
   AdminUserSummary,
-  AdminUsersResponse,
+  AdminUsersResponse, AdminOperationalResponse,
 } from "../types";
 
 const fallbackAvatar =
@@ -40,6 +42,7 @@ const adminNav = [
   { label: "Users", to: "/admin/users", icon: Users },
   { label: "Activity", to: "/admin/activity", icon: Activity },
   { label: "Plans", to: "/admin/plans", icon: CreditCard },
+  { label: "Safety alerts", to: "/admin/safety-alerts", icon: AlertTriangle },
 ] as const;
 
 const pageTitles: Record<string, string> = {
@@ -47,6 +50,7 @@ const pageTitles: Record<string, string> = {
   "/admin/users": "Users",
   "/admin/activity": "Activity",
   "/admin/plans": "Plans",
+  "/admin/safety-alerts": "Critical safety alerts",
 };
 
 const apiMessage = (error: unknown) => toApiError(error).message;
@@ -121,17 +125,30 @@ function MetricCard({
   label,
   value,
   helper,
+  to,
+  tone = "rose",
 }: {
   label: string;
   value: string | number;
   helper?: string;
+  to?: string;
+  tone?: "rose" | "amber" | "red" | "emerald" | "violet";
 }) {
+  const tones = {
+    rose: "border-rose-200/60 bg-rose-50/70 text-rose-950 shadow-rose-500/10",
+    amber: "border-amber-200/70 bg-amber-50/80 text-amber-950 shadow-amber-500/10",
+    red: "border-red-200/70 bg-red-50/80 text-red-950 shadow-red-500/10",
+    emerald: "border-emerald-200/70 bg-emerald-50/80 text-emerald-950 shadow-emerald-500/10",
+    violet: "border-violet-200/70 bg-violet-50/80 text-violet-950 shadow-violet-500/10",
+  }[tone];
+  const body = <>
+    <p className="text-xs font-semibold uppercase tracking-[0.18em] opacity-65">{label}</p>
+    <div className="mt-2 text-3xl font-black">{value}</div>
+    {helper && <p className="mt-2 text-sm opacity-75">{helper}</p>}
+  </>;
   return (
-    <article className="rounded-3xl border border-[#e4bdbe]/50 bg-white p-5 shadow-sm shadow-[#8c0026]/5">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8c0026]/70">{label}</p>
-      <div className="mt-2 text-3xl font-black text-[#36151a]">{value}</div>
-      {helper && <p className="mt-2 text-sm text-[#5b4041]">{helper}</p>}
-    </article>
+    to ? <Link to={to} className={`block rounded-3xl border p-5 shadow-lg backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-xl ${tones}`}>{body}</Link>
+      : <article className={`rounded-3xl border p-5 shadow-lg backdrop-blur-xl ${tones}`}>{body}</article>
   );
 }
 
@@ -295,6 +312,7 @@ function UserCard({
 export function AdminDashboardPage() {
   const [data, setData] = useState<AdminOverviewResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reportPeriod, setReportPeriod] = useState<"daily" | "weekly" | "monthly" | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -314,14 +332,31 @@ export function AdminDashboardPage() {
   }, []);
 
   const metrics = data?.metrics;
+  const downloadReport = async (period: "daily" | "weekly" | "monthly") => {
+    setReportPeriod(period);
+    try { await adminService.downloadReport(period); toast.success(`${period[0].toUpperCase()}${period.slice(1)} PDF report downloaded.`); }
+    catch (error) { toast.error(apiMessage(error)); }
+    finally { setReportPeriod(null); }
+  };
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-4 xl:grid-cols-4">
-        <MetricCard label="Total users" value={metrics?.totalUsers ?? 0} helper="Registered accounts" />
-        <MetricCard label="Active users" value={metrics?.activeUsers ?? 0} helper="Accounts currently enabled" />
-        <MetricCard label="Profile completion" value={`${metrics?.profileCompletionRate ?? 0}%`} helper={`${metrics?.completeProfiles ?? 0} complete profiles`} />
-        <MetricCard label="Pending requests" value={metrics?.pendingRequests ?? 0} helper="Open connection requests" />
+      <section className="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-amber-200/70 bg-amber-50/80 p-5 shadow-lg shadow-amber-500/10 backdrop-blur-xl">
+        <div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-800/70">Exports</p><h2 className="mt-1 text-xl font-black text-amber-950">Download admin reports</h2><p className="mt-1 text-sm text-amber-900/75">Get a PDF snapshot of platform activity, safety, and subscriptions.</p></div>
+        <div className="flex flex-wrap gap-2">{(["daily", "weekly", "monthly"] as const).map((period) => <button key={period} type="button" disabled={reportPeriod !== null} onClick={() => void downloadReport(period)} className="inline-flex items-center gap-2 rounded-full bg-amber-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-950 disabled:opacity-60"><Download size={15}/>{reportPeriod === period ? "Preparing..." : `${period[0].toUpperCase()}${period.slice(1)} PDF`}</button>)}</div>
+      </section>
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard to="/admin/users" tone="rose" label="Total users" value={metrics?.totalUsers ?? 0} helper="Registered accounts" />
+        <MetricCard to="/admin/new-users" tone="amber" label="New users" value={metrics?.newUsersToday ?? 0} helper={`${metrics?.newUsersWeek ?? 0} this week · ${metrics?.newUsersMonth ?? 0} this month`} />
+        <MetricCard to="/admin/users" tone="emerald" label="Active users" value={metrics?.activeUsers ?? 0} helper="Accounts currently enabled" />
+        <MetricCard to="/admin/matches" tone="violet" label="New matches" value={metrics?.totalMatches ?? 0} helper="All recorded matches" />
+        <MetricCard to="/admin/messages" tone="rose" label="Messages sent" value={metrics?.totalMessages ?? 0} helper="Stored delivery records" />
+        <MetricCard to="/admin/reports" tone="red" label="Reports" value={metrics?.reports ?? 0} helper="Open or under review" />
+        <MetricCard to="/admin/moderation" tone="red" label="Suspended / banned" value={(metrics?.suspendedUsers ?? 0) + (metrics?.bannedUsers ?? 0)} helper={`${metrics?.bannedUsers ?? 0} permanently banned`} />
+        <MetricCard to="/admin/verification" tone="emerald" label="Verified users" value={metrics?.verifiedUsers ?? 0} helper="Email-verified accounts" />
+        <MetricCard to="/admin/premium-users" tone="violet" label="Premium users" value={metrics?.premiumUsers ?? 0} helper="Active premium subscriptions" />
+        <MetricCard to="/admin/revenue" tone="amber" label="Revenue" value={`UGX ${(metrics?.revenueUGX ?? 0).toLocaleString()}`} helper="Estimated monthly recurring" />
+        <MetricCard to="/admin/safety-alerts" tone="red" label="Critical safety alerts" value={metrics?.criticalSafetyAlerts ?? 0} helper="High-priority reports" />
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
@@ -342,11 +377,6 @@ export function AdminDashboardPage() {
         </Link>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-3">
-        <MetricCard label="New users" value={metrics?.newUsersLast30Days ?? 0} helper="Joined in the last 30 days" />
-        <MetricCard label="Messages" value={metrics?.totalMessages ?? 0} helper="Stored chat messages" />
-        <MetricCard label="Matches" value={metrics?.totalMatches ?? 0} helper="Current match records" />
-      </section>
 
       <section className="rounded-3xl border border-[#f1dada] bg-white p-5 shadow-sm shadow-[#8c0026]/5">
         <div className="flex items-center justify-between gap-3">
@@ -899,6 +929,54 @@ export function AdminActivityPage() {
       </Modal>
     </>
   );
+}
+
+const operationPages: Record<string, { title: string; resource: string; description: string }> = {
+  "new-users": { title: "New users", resource: "new-users", description: "Review the most recent people who have joined the platform." },
+  matches: { title: "Matches", resource: "matches", description: "Inspect recently created matches across the platform." },
+  messages: { title: "Messages sent", resource: "messages", description: "Review message delivery metadata. Message contents remain private." },
+  reports: { title: "Reports", resource: "reports", description: "Triage user reports and record a moderation outcome." },
+  moderation: { title: "Suspended and banned users", resource: "moderation", description: "Restore, suspend, or permanently ban accounts." },
+  verification: { title: "Verified users", resource: "verification", description: "Review verified accounts and revoke verification when necessary." },
+  "premium-users": { title: "Premium users", resource: "premium-users", description: "Review active premium members and update a subscription tier." },
+  revenue: { title: "Revenue", resource: "revenue", description: "Estimated recurring subscription revenue from active plans." },
+  "safety-alerts": { title: "Critical safety alerts", resource: "safety-alerts", description: "High-severity reports that need immediate review." },
+};
+
+export function AdminOperationsPage() {
+  const location = useLocation();
+  const key = location.pathname.split("/").pop() || "reports";
+  const config = operationPages[key] || operationPages.reports;
+  const [data, setData] = useState<AdminOperationalResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const load = async () => { setLoading(true); try { setData(await adminService.operational(config.resource)); } catch (error) { toast.error(apiMessage(error)); } finally { setLoading(false); } };
+  useEffect(() => { void load(); }, [config.resource]);
+  const action = async (item: Record<string, unknown>, name: string) => {
+    try {
+      const id = String(item.id || item._id);
+      if (config.resource === "reports" || config.resource === "safety-alerts") await adminService.reviewReport(id, name as "reviewing" | "resolved" | "dismissed");
+      if (config.resource === "moderation") await adminService.updateModeration(id, name as "active" | "suspended" | "banned");
+      if (config.resource === "verification") await adminService.updateVerification(id, name === "verify");
+      if (config.resource === "premium-users") await adminService.updateSubscription(id, name as "free" | "basic" | "premium");
+      toast.success("Update saved."); await load();
+    } catch (error) { toast.error(apiMessage(error)); }
+  };
+  const userName = (person: unknown) => typeof person === "object" && person ? String((person as { fullName?: string }).fullName || "Unknown user") : "Unknown user";
+  return <div className="space-y-5">
+    <section className="rounded-3xl border border-rose-200/60 bg-rose-50/70 p-5 shadow-lg shadow-rose-500/10 backdrop-blur-xl">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8c0026]/70">Operations</p><h3 className="mt-1 text-2xl font-black text-[#36151a]">{config.title}</h3><p className="mt-2 text-sm text-[#5b4041]">{config.description}</p>
+    </section>
+    {loading ? <div className="flex items-center gap-3 rounded-3xl border border-[#f1dada] bg-white/75 p-6 backdrop-blur-xl text-[#5b4041]"><LoaderCircle className="animate-spin" size={18} /> Loading records...</div> :
+      <section className="space-y-3">{(data?.items || []).map((item, index) => <article key={String(item.id || item._id || index)} className="rounded-3xl border border-[#f1dada] bg-white/75 p-5 shadow-sm backdrop-blur-xl">
+        <div className="flex flex-wrap items-start justify-between gap-4"><div><h4 className="font-bold text-[#36151a]">{String(item.reason || item.label || item.pairKey || userName(item.sender) || item.fullName || "Record")}</h4>
+          <p className="mt-1 text-sm text-[#5b4041]">{item.reporter ? `${userName(item.reporter)} reported ${userName(item.reportedUser)}` : item.email ? String(item.email) : item.amountUGX ? `UGX ${Number(item.amountUGX).toLocaleString()}` : item.createdAt ? new Date(String(item.createdAt)).toLocaleString() : ""}</p>
+          {Boolean(item.status) && <span className="mt-2 inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">{String(item.status)}</span>}</div>
+          <div className="flex flex-wrap gap-2">{(config.resource === "reports" || config.resource === "safety-alerts") && <><button onClick={() => action(item, "reviewing")} className="rounded-full border border-amber-300 px-3 py-2 text-sm font-semibold text-amber-800">Review</button><button onClick={() => action(item, "resolved")} className="rounded-full bg-emerald-600 px-3 py-2 text-sm font-semibold text-white">Resolve</button><button onClick={() => action(item, "dismissed")} className="rounded-full border border-rose-300 px-3 py-2 text-sm font-semibold text-rose-700">Dismiss</button></>}
+          {config.resource === "moderation" && <><button onClick={() => action(item, "active")} className="rounded-full bg-emerald-600 px-3 py-2 text-sm font-semibold text-white">Restore</button><button onClick={() => action(item, "banned")} className="rounded-full bg-red-600 px-3 py-2 text-sm font-semibold text-white">Ban</button></>}
+          {config.resource === "verification" && <button onClick={() => action(item, "revoke")} className="rounded-full border border-rose-300 px-3 py-2 text-sm font-semibold text-rose-700">Revoke verification</button>}
+          {config.resource === "premium-users" && <button onClick={() => action(item, "free")} className="rounded-full border border-rose-300 px-3 py-2 text-sm font-semibold text-rose-700">Move to free</button>}</div></div>
+      </article>)}{!data?.items.length && <p className="rounded-3xl border border-dashed border-[#e4bdbe] bg-white/60 p-8 text-center text-sm text-[#7b6466]">No records need attention right now.</p>}</section>}
+  </div>;
 }
 
 export function AdminPlansPage() {

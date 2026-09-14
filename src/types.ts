@@ -137,6 +137,21 @@ export interface AdminOverviewMetrics {
   totalMessages: number;
   totalMatches: number;
   pendingRequests: number;
+  newUsersToday: number;
+  newUsersWeek: number;
+  newUsersMonth: number;
+  reports: number;
+  suspendedUsers: number;
+  bannedUsers: number;
+  verifiedUsers: number;
+  premiumUsers: number;
+  revenueUGX: number;
+  criticalSafetyAlerts: number;
+}
+
+export interface AdminOperationalResponse {
+  items: Array<Record<string, unknown>>;
+  pagination: { page: number; limit: number; total: number; pages: number };
 }
 
 export interface AdminOverviewResponse {

@@ -802,7 +802,12 @@ function Field({ label, value, onChange }: { label: string; value: string; onCha
 export function CompleteProfilePage() {
   const [bio, setBio] = useState(DEMO_USER.bio ?? ""); const [interests, setInterests] = useState<string[]>(DEMO_USER.interests ?? []); const [lifestyle, setLifestyle] = useState<string[]>(DEMO_USER.lifestyle ?? []); const [goal, setGoal] = useState(DEMO_USER.relationshipGoal ?? ""); const [done, setDone] = useState(false);
   const toggle = (list: string[], setList: (value: string[]) => void, value: string) => setList(list.includes(value) ? list.filter((item) => item !== value) : [...list, value]);
-  const interestOptions = ["Photography", "Travel", "Hiking", "Coffee", "Music", "Art", "Fitness", "Cooking", "Books", "Wellness"];
+  const interestOptions = [
+    "Travel & Adventure", "Music", "Movies & TV", "Cooking & Food", "Fitness & Wellness",
+    "Sports", "Reading & Books", "Art & Creativity", "Dancing", "Nature & Outdoors",
+    "Faith & Spirituality", "Business & Entrepreneurship", "Technology", "Photography", "Gaming",
+    "Animals & Pets", "Fashion & Style", "Concerts & Live Events", "Community & Volunteering", "Culture & Languages",
+  ];
   const lifestyleOptions = ["Active", "Non-smoker", "Health-conscious", "Adventurer", "Homebody", "Foodie"];
   const goals = ["Long-term relationship", "Marriage", "Friendship first"];
   const checks = [Boolean(bio.trim()), interests.length > 0, lifestyle.length > 0, Boolean(goal), DEMO_USER.photos && DEMO_USER.photos.length > 0, Boolean(DEMO_USER.occupation), Boolean(DEMO_USER.education)];

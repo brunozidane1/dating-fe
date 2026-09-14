@@ -216,7 +216,12 @@ export function ConnectedCompleteProfilePage() {
     setter(values.includes(value) ? values.filter((item) => item !== value) : [...values, value]);
   };
 
-  const interestOptions = ["Photography", "Travel", "Hiking", "Coffee", "Music", "Art", "Fitness", "Cooking", "Books", "Wellness"];
+  const interestOptions = [
+    "Travel & Adventure", "Music", "Movies & TV", "Cooking & Food", "Fitness & Wellness",
+    "Sports", "Reading & Books", "Art & Creativity", "Dancing", "Nature & Outdoors",
+    "Faith & Spirituality", "Business & Entrepreneurship", "Technology", "Photography", "Gaming",
+    "Animals & Pets", "Fashion & Style", "Concerts & Live Events", "Community & Volunteering", "Culture & Languages",
+  ];
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

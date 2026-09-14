@@ -516,3 +516,5 @@ textarea:focus-visible {
 .action-icon:disabled { cursor: wait; opacity: .8; }
 .action-icon::after { position: absolute; z-index: 80; bottom: calc(100% + 8px); left: 50%; padding: 5px 8px; border-radius: 6px; color: #fff; background: #191c1e; content: attr(data-tooltip); font-size: 11px; font-weight: 600; line-height: 1; white-space: nowrap; pointer-events: none; opacity: 0; transform: translate(-50%, 4px); transition: opacity .16s ease, transform .16s ease; }
 .action-icon:hover::after, .action-icon:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
+/* Obscure member data while the page is backgrounded or the app switcher is open. */
+.privacy-obscured body > #root { filter: blur(24px) brightness(.18); user-select: none; }
