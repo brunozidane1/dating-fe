@@ -41,7 +41,7 @@ const adminNav = [
   { label: "Dashboard", to: "/admin", icon: LayoutDashboard },
   { label: "Users", to: "/admin/users", icon: Users },
   { label: "New users", to: "/admin/new-users", icon: Users },
-  { label: "Active users", to: "/admin/users", icon: Activity },
+  { label: "Active users", to: "/admin/active-users", icon: Activity },
   { label: "Matches", to: "/admin/matches", icon: Activity },
   { label: "Reports", to: "/admin/reports", icon: AlertTriangle },
   { label: "Moderation", to: "/admin/moderation", icon: ShieldOff },
@@ -57,6 +57,7 @@ const pageTitles: Record<string, string> = {
   "/admin": "Dashboard",
   "/admin/users": "Users",
   "/admin/new-users": "New users",
+  "/admin/active-users": "Active users",
   "/admin/matches": "Matches",
   "/admin/reports": "Reports",
   "/admin/moderation": "Moderation",
@@ -280,51 +281,6 @@ function AdminLayout() {
   );
 }
 
-function UserCard({
-  user,
-  onOpen,
-  onToggle,
-}: {
-  user: AdminUserSummary;
-  onOpen: (user: AdminUserSummary) => void;
-  onToggle: (user: AdminUserSummary) => void;
-}) {
-  return (
-    <article className="rounded-3xl border border-[#f1dada] bg-white p-4 shadow-sm shadow-[#8c0026]/5">
-      <div className="flex items-start gap-3">
-        <Avatar user={user} />
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="truncate text-base font-bold text-[#36151a]">{user.name}</h3>
-            <StatusPill active={user.isActive} />
-          </div>
-          <p className="truncate text-sm text-[#7b6466]">{user.email}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <CompletionPill complete={user.isProfileComplete} />
-            {user.location && <span className="rounded-full bg-[#fff7f7] px-3 py-1 text-xs font-semibold text-[#8c0026]">{user.location}</span>}
-          </div>
-        </div>
-      </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => onOpen(user)}
-          className="inline-flex items-center gap-2 rounded-full border border-[#e4bdbe] px-4 py-2 text-sm font-semibold text-[#5b4041] transition hover:bg-[#fff7f7]"
-        >
-          View
-        </button>
-        <button
-          type="button"
-          onClick={() => onToggle(user)}
-          className="inline-flex items-center gap-2 rounded-full bg-[#8c0026] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#71001f]"
-        >
-          {user.isActive ? "Disable" : "Enable"}
-        </button>
-      </div>
-    </article>
-  );
-}
-
 export function AdminDashboardPage() {
   const [data, setData] = useState<AdminOverviewResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -364,7 +320,7 @@ export function AdminDashboardPage() {
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard to="/admin/users" tone="blue" label="Total users" value={metrics?.totalUsers ?? 0} helper="Registered accounts" />
         <MetricCard to="/admin/new-users" tone="violet" label="New users" value={metrics?.newUsersToday ?? 0} helper={`${metrics?.newUsersWeek ?? 0} this week · ${metrics?.newUsersMonth ?? 0} this month`} />
-        <MetricCard to="/admin/users" tone="emerald" label="Active users" value={metrics?.activeUsers ?? 0} helper="Accounts currently enabled" />
+        <MetricCard to="/admin/active-users" tone="emerald" label="Active users" value={metrics?.activeUsers ?? 0} helper="Accounts currently enabled" />
         <MetricCard to="/admin/matches" tone="violet" label="New matches" value={metrics?.totalMatches ?? 0} helper="All recorded matches" />
         <MetricCard tone="blue" label="Messages sent" value={metrics?.totalMessages ?? 0} helper="Privacy-safe delivery count only" />
         <MetricCard to="/admin/reports" tone="red" label="Reports" value={metrics?.reports ?? 0} helper="Open or under review" />
@@ -417,6 +373,7 @@ export function AdminDashboardPage() {
 }
 
 export function AdminUsersPage() {
+  const activeOnly = useLocation().pathname === "/admin/active-users";
   const [data, setData] = useState<AdminUsersResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -433,10 +390,10 @@ export function AdminUsersPage() {
       page,
       limit: 10,
       search: search.trim() || undefined,
-      status: status === "all" ? undefined : status,
+      status: activeOnly ? "active" : status === "all" ? undefined : status,
       complete: complete === "all" ? undefined : complete === "true",
     }),
-    [page, search, status, complete],
+    [page, search, status, complete, activeOnly],
   );
 
   const loadUsers = async () => {
@@ -510,7 +467,8 @@ export function AdminUsersPage() {
           <label>
             <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.18em] text-[#8c0026]/70">Status</span>
             <select
-              value={status}
+              value={activeOnly ? "active" : status}
+              disabled={activeOnly}
               onChange={(event) => {
                 setPage(1);
                 setStatus(event.target.value as typeof status);
@@ -547,18 +505,7 @@ export function AdminUsersPage() {
           </div>
         ) : (
           <>
-            <div className="grid gap-4 md:hidden">
-              {(data?.users ?? []).map((user) => (
-                <UserCard
-                  key={user.id}
-                  user={user}
-                  onOpen={openUser}
-                  onToggle={(item) => setConfirmUser(item)}
-                />
-              ))}
-            </div>
-
-            <div className="hidden overflow-hidden rounded-3xl border border-[#f1dada] bg-white shadow-sm shadow-[#8c0026]/5 md:block">
+            <div className="overflow-hidden rounded-3xl border border-[#f1dada] bg-white shadow-sm shadow-[#8c0026]/5">
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left">
                   <thead className="bg-[#fff7f7] text-xs uppercase tracking-[0.18em] text-[#8c0026]/70">
@@ -792,89 +739,20 @@ export function AdminActivityPage() {
                 Inspect users
               </Link>
             </div>
-            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-              {(data?.recentUsers ?? []).map((user) => (
-                <button
-                  key={user.id}
-                  type="button"
-                  onClick={() => setDetail(user)}
-                  className="rounded-2xl border border-[#f1dada] bg-[#fffdfd] p-4 text-left transition hover:-translate-y-0.5"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar user={user} />
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold text-[#36151a]">{user.name}</p>
-                      <p className="truncate text-xs text-[#7b6466]">{user.email}</p>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <StatusPill active={user.isActive} />
-                    <CompletionPill complete={user.isProfileComplete} />
-                  </div>
-                </button>
-              ))}
-            </div>
+            <div className="mt-4 overflow-x-auto"><table className="min-w-full text-left text-sm"><thead className="bg-[#fff2f2]"><tr><th className="px-4 py-3">User</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Profile</th><th className="px-4 py-3">Joined</th></tr></thead><tbody>{(data?.recentUsers ?? []).map((user) => <tr key={user.id} onClick={() => setDetail(user)} className="cursor-pointer border-t border-[#f1dada] hover:bg-[#fffafa]"><td className="px-4 py-3"><div className="flex items-center gap-3"><Avatar user={user}/><span><b>{user.name}</b><small className="block text-[#7b6466]">{user.email}</small></span></div></td><td className="px-4 py-3"><StatusPill active={user.isActive}/></td><td className="px-4 py-3"><CompletionPill complete={user.isProfileComplete}/></td><td className="px-4 py-3">{new Date(user.createdAt).toLocaleDateString()}</td></tr>)}</tbody></table></div>
           </section>
 
           <section className="grid gap-6 xl:grid-cols-2">
             <div className="rounded-3xl border border-[#f1dada] bg-white p-5 shadow-sm shadow-[#8c0026]/5">
               <h3 className="text-xl font-bold text-[#36151a]">Connection requests</h3>
               <p className="text-sm text-[#5b4041]">A quick look at who is requesting to connect.</p>
-              <div className="mt-4 space-y-3">
-                {(data?.connectionRequests ?? []).map((request) => (
-                  <button
-                    key={request.id}
-                    type="button"
-                    onClick={() => setDetail(request)}
-                    className="w-full rounded-2xl border border-[#f1dada] bg-[#fffdfd] p-4 text-left transition hover:bg-[#fff7f7]"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate font-semibold text-[#36151a]">
-                          {request.requester.name} → {request.recipient.name}
-                        </p>
-                        <p className="text-xs text-[#7b6466]">
-                          Requested on {new Date(request.createdAt).toLocaleString()}
-                        </p>
-                      </div>
-                      <span className="rounded-full bg-[#fff0f4] px-3 py-1 text-xs font-semibold text-[#8c0026]">
-                        {request.status}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-                {!data?.connectionRequests.length && <p className="text-sm text-[#7b6466]">No recent requests.</p>}
-              </div>
+              <div className="mt-4 overflow-x-auto"><table className="min-w-full text-left text-sm"><thead className="bg-[#fff2f2]"><tr><th className="px-4 py-3">Requester</th><th className="px-4 py-3">Recipient</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Date</th></tr></thead><tbody>{(data?.connectionRequests ?? []).map((request) => <tr key={request.id} onClick={() => setDetail(request)} className="cursor-pointer border-t border-[#f1dada] hover:bg-[#fffafa]"><td className="px-4 py-3">{request.requester.name}</td><td className="px-4 py-3">{request.recipient.name}</td><td className="px-4 py-3">{request.status}</td><td className="px-4 py-3">{new Date(request.createdAt).toLocaleDateString()}</td></tr>)}</tbody></table>{!data?.connectionRequests.length && <p className="p-4 text-sm text-[#7b6466]">No recent requests.</p>}</div>
             </div>
 
             <div className="rounded-3xl border border-[#f1dada] bg-white p-5 shadow-sm shadow-[#8c0026]/5">
               <h3 className="text-xl font-bold text-[#36151a]">Recent matches</h3>
               <p className="text-sm text-[#5b4041]">Match records are useful for moderation and analytics.</p>
-              <div className="mt-4 space-y-3">
-                {(data?.recentMatches ?? []).map((match) => (
-                  <button
-                    key={match.id}
-                    type="button"
-                    onClick={() => setDetail(match)}
-                    className="w-full rounded-2xl border border-[#f1dada] bg-[#fffdfd] p-4 text-left transition hover:bg-[#fff7f7]"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate font-semibold text-[#36151a]">
-                          {match.users.map((user) => user.name).join(" + ")}
-                        </p>
-                        <p className="text-xs text-[#7b6466]">
-                          Matched on {new Date(match.matchedAt).toLocaleString()}
-                        </p>
-                      </div>
-                      <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                        {match.matchPercentage}%
-                      </span>
-                    </div>
-                  </button>
-                ))}
-                {!data?.recentMatches.length && <p className="text-sm text-[#7b6466]">No recent matches.</p>}
-              </div>
+              <div className="mt-4 overflow-x-auto"><table className="min-w-full text-left text-sm"><thead className="bg-[#fff2f2]"><tr><th className="px-4 py-3">Members</th><th className="px-4 py-3">Match score</th><th className="px-4 py-3">Date</th></tr></thead><tbody>{(data?.recentMatches ?? []).map((match) => <tr key={match.id} onClick={() => setDetail(match)} className="cursor-pointer border-t border-[#f1dada] hover:bg-[#fffafa]"><td className="px-4 py-3">{match.users.map((user) => user.name).join(" + ")}</td><td className="px-4 py-3">{match.matchPercentage}%</td><td className="px-4 py-3">{new Date(match.matchedAt).toLocaleDateString()}</td></tr>)}</tbody></table>{!data?.recentMatches.length && <p className="p-4 text-sm text-[#7b6466]">No recent matches.</p>}</div>
             </div>
           </section>
         </div>
