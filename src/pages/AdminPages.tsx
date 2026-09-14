@@ -40,14 +40,31 @@ const fallbackAvatar =
 const adminNav = [
   { label: "Dashboard", to: "/admin", icon: LayoutDashboard },
   { label: "Users", to: "/admin/users", icon: Users },
+  { label: "New users", to: "/admin/new-users", icon: Users },
+  { label: "Active users", to: "/admin/users", icon: Activity },
+  { label: "Matches", to: "/admin/matches", icon: Activity },
+  { label: "Messages", to: "/admin/messages", icon: Activity },
+  { label: "Reports", to: "/admin/reports", icon: AlertTriangle },
+  { label: "Moderation", to: "/admin/moderation", icon: ShieldOff },
+  { label: "Verified users", to: "/admin/verification", icon: BadgeCheck },
+  { label: "Premium users", to: "/admin/premium-users", icon: CreditCard },
+  { label: "Revenue", to: "/admin/revenue", icon: CreditCard },
+  { label: "Safety alerts", to: "/admin/safety-alerts", icon: AlertTriangle },
   { label: "Activity", to: "/admin/activity", icon: Activity },
   { label: "Plans", to: "/admin/plans", icon: CreditCard },
-  { label: "Safety alerts", to: "/admin/safety-alerts", icon: AlertTriangle },
 ] as const;
 
 const pageTitles: Record<string, string> = {
   "/admin": "Dashboard",
   "/admin/users": "Users",
+  "/admin/new-users": "New users",
+  "/admin/matches": "Matches",
+  "/admin/messages": "Messages",
+  "/admin/reports": "Reports",
+  "/admin/moderation": "Moderation",
+  "/admin/verification": "Verified users",
+  "/admin/premium-users": "Premium users",
+  "/admin/revenue": "Revenue",
   "/admin/activity": "Activity",
   "/admin/plans": "Plans",
   "/admin/safety-alerts": "Critical safety alerts",
@@ -132,14 +149,15 @@ function MetricCard({
   value: string | number;
   helper?: string;
   to?: string;
-  tone?: "rose" | "amber" | "red" | "emerald" | "violet";
+  tone?: "rose" | "amber" | "red" | "emerald" | "violet" | "blue";
 }) {
   const tones = {
-    rose: "border-rose-200/60 bg-rose-50/70 text-rose-950 shadow-rose-500/10",
-    amber: "border-amber-200/70 bg-amber-50/80 text-amber-950 shadow-amber-500/10",
-    red: "border-red-200/70 bg-red-50/80 text-red-950 shadow-red-500/10",
-    emerald: "border-emerald-200/70 bg-emerald-50/80 text-emerald-950 shadow-emerald-500/10",
-    violet: "border-violet-200/70 bg-violet-50/80 text-violet-950 shadow-violet-500/10",
+    rose: "border-rose-600 bg-rose-600 text-white shadow-rose-600/35",
+    amber: "border-amber-500 bg-amber-500 text-white shadow-amber-500/35",
+    red: "border-red-600 bg-red-600 text-white shadow-red-600/35",
+    emerald: "border-emerald-600 bg-emerald-600 text-white shadow-emerald-600/35",
+    violet: "border-violet-600 bg-violet-600 text-white shadow-violet-600/35",
+    blue: "border-blue-600 bg-blue-600 text-white shadow-blue-600/35",
   }[tone];
   const body = <>
     <p className="text-xs font-semibold uppercase tracking-[0.18em] opacity-65">{label}</p>
@@ -190,7 +208,7 @@ function AdminLayout() {
             </div>
           </div>
 
-          <nav className="flex-1 space-y-2 px-4 py-5" aria-label="Admin navigation">
+          <nav className="flex-1 space-y-2 overflow-y-auto px-4 py-5" aria-label="Admin navigation">
             {adminNav.map(({ label, to, icon: Icon }) => (
               <NavLink
                 key={to}
@@ -346,11 +364,11 @@ export function AdminDashboardPage() {
         <div className="flex flex-wrap gap-2">{(["daily", "weekly", "monthly"] as const).map((period) => <button key={period} type="button" disabled={reportPeriod !== null} onClick={() => void downloadReport(period)} className="inline-flex items-center gap-2 rounded-full bg-amber-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-950 disabled:opacity-60"><Download size={15}/>{reportPeriod === period ? "Preparing..." : `${period[0].toUpperCase()}${period.slice(1)} PDF`}</button>)}</div>
       </section>
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard to="/admin/users" tone="rose" label="Total users" value={metrics?.totalUsers ?? 0} helper="Registered accounts" />
-        <MetricCard to="/admin/new-users" tone="amber" label="New users" value={metrics?.newUsersToday ?? 0} helper={`${metrics?.newUsersWeek ?? 0} this week · ${metrics?.newUsersMonth ?? 0} this month`} />
+        <MetricCard to="/admin/users" tone="blue" label="Total users" value={metrics?.totalUsers ?? 0} helper="Registered accounts" />
+        <MetricCard to="/admin/new-users" tone="violet" label="New users" value={metrics?.newUsersToday ?? 0} helper={`${metrics?.newUsersWeek ?? 0} this week · ${metrics?.newUsersMonth ?? 0} this month`} />
         <MetricCard to="/admin/users" tone="emerald" label="Active users" value={metrics?.activeUsers ?? 0} helper="Accounts currently enabled" />
         <MetricCard to="/admin/matches" tone="violet" label="New matches" value={metrics?.totalMatches ?? 0} helper="All recorded matches" />
-        <MetricCard to="/admin/messages" tone="rose" label="Messages sent" value={metrics?.totalMessages ?? 0} helper="Stored delivery records" />
+        <MetricCard to="/admin/messages" tone="blue" label="Messages sent" value={metrics?.totalMessages ?? 0} helper="Stored delivery records" />
         <MetricCard to="/admin/reports" tone="red" label="Reports" value={metrics?.reports ?? 0} helper="Open or under review" />
         <MetricCard to="/admin/moderation" tone="red" label="Suspended / banned" value={(metrics?.suspendedUsers ?? 0) + (metrics?.bannedUsers ?? 0)} helper={`${metrics?.bannedUsers ?? 0} permanently banned`} />
         <MetricCard to="/admin/verification" tone="emerald" label="Verified users" value={metrics?.verifiedUsers ?? 0} helper="Email-verified accounts" />
@@ -378,13 +396,13 @@ export function AdminDashboardPage() {
       </section>
 
 
-      <section className="rounded-3xl border border-[#f1dada] bg-white p-5 shadow-sm shadow-[#8c0026]/5">
+      <section className="overflow-hidden rounded-3xl border border-[#f1dada] bg-white shadow-sm shadow-[#8c0026]/5">
         <div className="flex items-center justify-between gap-3">
-          <div>
+          <div className="p-5">
             <h2 className="text-xl font-bold text-[#36151a]">Recent signups</h2>
             <p className="text-sm text-[#5b4041]">The latest people joining the platform.</p>
           </div>
-          <Link to="/admin/users" className="text-sm font-semibold text-[#8c0026]">
+          <Link to="/admin/users" className="p-5 text-sm font-semibold text-[#8c0026]">
             Open users
           </Link>
         </div>
@@ -393,23 +411,7 @@ export function AdminDashboardPage() {
             <LoaderCircle className="animate-spin" size={18} /> Loading overview...
           </div>
         ) : (
-          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {(data?.recentUsers ?? []).map((user) => (
-              <div key={user.id} className="rounded-2xl border border-[#f1dada] bg-[#fffdfd] p-4">
-                <div className="flex items-center gap-3">
-                  <Avatar user={user} />
-                  <div className="min-w-0">
-                    <p className="truncate font-semibold text-[#36151a]">{user.name}</p>
-                    <p className="truncate text-xs text-[#7b6466]">{user.email}</p>
-                  </div>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <StatusPill active={user.isActive} />
-                  <CompletionPill complete={user.isProfileComplete} />
-                </div>
-              </div>
-            ))}
-          </div>
+          <div className="overflow-x-auto border-t border-[#f1dada]"><table className="min-w-full text-left text-sm"><thead className="bg-[#fff2f2] text-[#5b4041]"><tr><th className="px-5 py-3 font-semibold">Member</th><th className="px-5 py-3 font-semibold">Location</th><th className="px-5 py-3 font-semibold">Status</th><th className="px-5 py-3 font-semibold">Profile</th><th className="px-5 py-3 font-semibold">Joined</th></tr></thead><tbody>{(data?.recentUsers ?? []).map((user) => <tr key={user.id} className="border-t border-[#f1dada] even:bg-[#fffafa]"><td className="px-5 py-3"><div className="flex items-center gap-3"><Avatar user={user}/><div><p className="font-semibold text-[#36151a]">{user.name}</p><p className="text-xs text-[#7b6466]">{user.email}</p></div></div></td><td className="px-5 py-3 text-[#5b4041]">{user.location || "Not set"}</td><td className="px-5 py-3"><StatusPill active={user.isActive}/></td><td className="px-5 py-3"><CompletionPill complete={user.isProfileComplete}/></td><td className="px-5 py-3 text-[#5b4041]">{new Date(user.createdAt).toLocaleDateString()}</td></tr>)}</tbody></table></div>
         )}
       </section>
     </div>
@@ -947,6 +949,7 @@ export function AdminOperationsPage() {
   const location = useLocation();
   const key = location.pathname.split("/").pop() || "reports";
   const config = operationPages[key] || operationPages.reports;
+  const isReportTable = config.resource === "reports" || config.resource === "safety-alerts";
   const [data, setData] = useState<AdminOperationalResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const load = async () => { setLoading(true); try { setData(await adminService.operational(config.resource)); } catch (error) { toast.error(apiMessage(error)); } finally { setLoading(false); } };
@@ -966,7 +969,8 @@ export function AdminOperationsPage() {
     <section className="rounded-3xl border border-rose-200/60 bg-rose-50/70 p-5 shadow-lg shadow-rose-500/10 backdrop-blur-xl">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8c0026]/70">Operations</p><h3 className="mt-1 text-2xl font-black text-[#36151a]">{config.title}</h3><p className="mt-2 text-sm text-[#5b4041]">{config.description}</p>
     </section>
-    {loading ? <div className="flex items-center gap-3 rounded-3xl border border-[#f1dada] bg-white/75 p-6 backdrop-blur-xl text-[#5b4041]"><LoaderCircle className="animate-spin" size={18} /> Loading records...</div> :
+    {loading ? <div className="flex items-center gap-3 rounded-3xl border border-[#f1dada] bg-white/75 p-6 backdrop-blur-xl text-[#5b4041]"><LoaderCircle className="animate-spin" size={18} /> Loading records...</div> : isReportTable ?
+      <section className="overflow-hidden rounded-3xl border border-[#f1dada] bg-white shadow-sm"><div className="overflow-x-auto"><table className="min-w-full text-left text-sm"><thead className="bg-[#8c0026] text-white"><tr><th className="px-5 py-4 font-semibold">Report</th><th className="px-5 py-4 font-semibold">Reporter</th><th className="px-5 py-4 font-semibold">Reported user</th><th className="px-5 py-4 font-semibold">Severity</th><th className="px-5 py-4 font-semibold">Status</th><th className="px-5 py-4 font-semibold">Actions</th></tr></thead><tbody>{(data?.items || []).map((item, index) => <tr key={String(item.id || item._id || index)} className="border-t border-[#f1dada] even:bg-[#fff8f8]"><td className="max-w-56 px-5 py-4 font-semibold text-[#36151a]">{String(item.reason || "Safety report")}</td><td className="px-5 py-4 text-[#5b4041]">{userName(item.reporter)}</td><td className="px-5 py-4 text-[#5b4041]">{userName(item.reportedUser)}</td><td className="px-5 py-4"><span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-bold text-red-800">{String(item.severity || "high")}</span></td><td className="px-5 py-4"><span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800">{String(item.status || "open")}</span></td><td className="px-5 py-4"><div className="flex gap-2"><button onClick={() => action(item, "reviewing")} className="rounded-full border border-amber-300 px-3 py-1.5 font-semibold text-amber-800">Review</button><button onClick={() => action(item, "resolved")} className="rounded-full bg-emerald-600 px-3 py-1.5 font-semibold text-white">Resolve</button></div></td></tr>)}</tbody></table>{!data?.items.length && <p className="p-8 text-center text-sm text-[#7b6466]">No reports need attention right now.</p>}</div></section> :
       <section className="space-y-3">{(data?.items || []).map((item, index) => <article key={String(item.id || item._id || index)} className="rounded-3xl border border-[#f1dada] bg-white/75 p-5 shadow-sm backdrop-blur-xl">
         <div className="flex flex-wrap items-start justify-between gap-4"><div><h4 className="font-bold text-[#36151a]">{String(item.reason || item.label || item.pairKey || userName(item.sender) || item.fullName || "Record")}</h4>
           <p className="mt-1 text-sm text-[#5b4041]">{item.reporter ? `${userName(item.reporter)} reported ${userName(item.reportedUser)}` : item.email ? String(item.email) : item.amountUGX ? `UGX ${Number(item.amountUGX).toLocaleString()}` : item.createdAt ? new Date(String(item.createdAt)).toLocaleString() : ""}</p>
