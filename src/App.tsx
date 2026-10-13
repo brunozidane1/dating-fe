@@ -13,7 +13,7 @@ import { ForgotPasswordPage, ResetPasswordPage } from "./pages/ResetPasswordPage
 import { ConnectedCompleteProfilePage, ConnectedLoginPage, ConnectedSignupPage } from "./pages/ConnectedAuthPages";
 import VerifyEmailPage from "./pages/VerifyEmail";
 import { AdminActivityPage, AdminDashboardPage, AdminLayout, AdminOperationsPage, AdminPlansPage, AdminUsersPage } from "./pages/AdminPages";
-import { ChatPage, ConnectionsPage, DiscoverPage, EditProfilePage, InfoPage, MatchesPage, MessagesPage, NotificationsPage, PricingPage, ProfileDetailPage, ProfileStudioPage, SearchPage, SettingsPage } from "./pages/ProductPages";
+import { ChatPage, ConnectionsPage, DiscoverPage, EditProfilePage, MatchesPage, MessagesPage, NotificationsPage, PricingPage, ProfileDetailPage, ProfileStudioPage, SearchPage, SettingsPage } from "./pages/ProductPages";
 
 function PrivacyGuard() {
   useEffect(() => {
