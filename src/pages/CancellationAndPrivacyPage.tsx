@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Lock, ShieldCheck } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 
 function PageHero({
   image,
