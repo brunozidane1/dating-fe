@@ -5,9 +5,12 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Footer from "./components/Footer";
+
 import "./index.css"
 import Home from "./pages/Home";
 import AboutPage from "./pages/AboutPage";
+import RefundAndPrivacyPage from "./pages/RefundAndPrivacyPage";
+import CancellationAndPrivacyPage from "./pages/CancellationAndPrivacyPage";
 import { ContactPage, CookiesPage, GuidelinesPage, HelpPage, PrivacyPage, SafetyPage, TermsPage } from "./pages/InfoPages";
 import { ForgotPasswordPage, ResetPasswordPage } from "./pages/ResetPasswordPages";
 import { ConnectedCompleteProfilePage, ConnectedLoginPage, ConnectedSignupPage } from "./pages/ConnectedAuthPages";
@@ -22,6 +25,7 @@ function PrivacyGuard() {
     const blockSensitiveShortcuts = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && ["p", "s"].includes(event.key.toLowerCase())) event.preventDefault();
     };
+
     document.addEventListener("visibilitychange", obscure);
     document.addEventListener("contextmenu", blockContextMenu);
     document.addEventListener("keydown", blockSensitiveShortcuts);
@@ -45,6 +49,8 @@ function Shell() {
       <Route path="plans" element={<AdminPlansPage />} />
       <Route path=":operation" element={<AdminOperationsPage />} />
     </Route><Route path="/login" element={<ConnectedLoginPage />} /><Route path="/signup" element={<ConnectedSignupPage />} /><Route path="/verify-email" element={<VerifyEmailPage />} /><Route path="/forgot-password" element={<ForgotPasswordPage />} /><Route path="/reset-password" element={<ResetPasswordPage />} />
+    <Route path="/refund-privacy" element={<RefundAndPrivacyPage />} />
+    <Route path="/cancellation-privacy" element={<CancellationAndPrivacyPage />} />
     <Route path="/about" element={<AboutPage />} /><Route path="/safety" element={<SafetyPage />} /><Route path="/guidelines" element={<GuidelinesPage />} /><Route path="/contact" element={<ContactPage />} /><Route path="/help" element={<HelpPage />} /><Route path="/privacy" element={<PrivacyPage />} /><Route path="/terms" element={<TermsPage />} /><Route path="/cookies" element={<CookiesPage />} /><Route path="*" element={<HelpPage />} />
   </Routes></main>{!auth && !admin && !messenger && <Footer/>}{!admin && !messenger && <div className="help-widget">{helpOpen && <aside className="help-popover"><button onClick={() => setHelpOpen(false)} aria-label="Close help"><X size={15}/></button><strong>Need a hand?</strong><p>Contact the Lovinara team directly.</p><p><b>Email:</b> info@lovinara.com</p><p><b>Phone:</b> 0788765430</p></aside>}<button className="help-toggle" onClick={() => setHelpOpen(!helpOpen)} aria-expanded={helpOpen} aria-label="Open help"><CircleHelp size={20}/><span>Help</span></button></div>}</>;
 }
