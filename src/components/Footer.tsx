@@ -6,7 +6,7 @@ type FootLink = { label: string; to: string };
 const links: Array<{ title: string; items: FootLink[] }> = [
   { title: "Product", items: [{ label: "Discover", to: "/discover" }, { label: "Matches", to: "/matches" }, { label: "Plans", to: "/pricing" }] },
   { title: "Support", items: [{ label: "Safety", to: "/safety" }, { label: "Help centre", to: "/help" }, { label: "Contact", to: "/contact" }] },
-  { title: "Company", items: [{ label: "About", to: "/about" }, { label: "Community guidelines", to: "/guidelines" }, { label: "Privacy", to: "/privacy" }, { label: "Refunds & privacy", to: "/refund-privacy" }, { label: "Cancellation & privacy", to: "/cancellation-privacy" }] },
+  { title: "Company", items: [{ label: "About", to: "/about" }, { label: "Community guidelines", to: "/guidelines" }, { label: "Privacy", to: "/privacy" }, { label: "Refunds policy", to: "/refund-privacy" }, { label: "Cancellation policy", to: "/cancellation-privacy" }] },
 ];
 
 export default function Footer() {

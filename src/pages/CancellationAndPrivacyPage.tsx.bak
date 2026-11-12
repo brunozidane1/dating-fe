@@ -1,0 +1,384 @@
+import { Link } from "react-router-dom";
+import { ArrowRight, ShieldCheck } from "lucide-react";
+
+function PageHero({
+  image,
+  eyebrow,
+  title,
+  accent,
+  copy,
+  children,
+}: {
+  image: string;
+  eyebrow: string;
+  title: string;
+  accent: string;
+  copy: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <section className="relative flex min-h-[480px] items-center overflow-hidden md:min-h-[540px]">
+      <img
+        src={image}
+        alt={eyebrow}
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#f7f9fb]/95 via-[#f7f9fb]/72 to-[#f7f9fb]/10" />
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 py-16 md:px-10">
+        <div className="w-full max-w-[560px] rounded-[2rem] border border-white/70 bg-white/70 p-6 shadow-[0_20px_40px_-10px_rgba(184,0,53,.18)] backdrop-blur-2xl sm:p-8">
+          <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.13em] text-rose-800">
+            <ShieldCheck size={14} fill="currentColor" /> {eyebrow}
+          </p>
+          <h1 className="mt-4 font-heading text-4xl font-semibold leading-[1.12] tracking-[-.04em] text-[#8c0026] sm:text-5xl">
+            {title}
+            <br />
+            <span className="font-light italic text-[#6f2f3a]">{accent}</span>
+          </h1>
+          <p className="mt-5 max-w-md text-sm leading-7 text-[#5b4041] sm:text-base">
+            {copy}
+          </p>
+          {children && (
+            <div className="mt-7 flex flex-wrap gap-3">{children}</div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CancellationAndPrivacySection(): React.JSX.Element {
+  return (
+    <section className="mx-auto max-w-4xl px-5 py-14 md:px-10">
+      <div className="space-y-4">
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            1. Cancellation of Premium renewal
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            Lovinara is an online matchmaking platform for adults aged 18 and
+            above. This Cancellation Policy explains how members can stop future
+            paid membership renewals and what happens to access after
+            cancellation.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            2. Monthly membership does not necessarily mean auto-renewal
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            The price notation "/mo" describes the monthly membership period; it
+            does not alone authorise recurring payment. A one-time or manually
+            renewed membership expires at the end of the purchased period unless
+            the member makes a new payment.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            Where automatic renewal is offered, Lovinara must show the renewal
+            amount, timing, payment method, and cancellation instructions before
+            checkout, and the member must affirmatively agree to recurring
+            billing. No automatic payment is to be initiated without that
+            consent.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            3. How to cancel future renewals
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            A member may request cancellation at any time by emailing{" "}
+            <a href="mailto:support@lovinara.com" className="text-rose-700 hover:underline">
+              support@lovinara.com
+            </a>
+            with the subject "Cancel Lovinara Renewal" and identifying the
+            Lovinara account email or member ID. Where a working self-service
+            billing or membership-cancellation function is available in the
+            account, members may use it instead. We may reasonably verify account
+            ownership but will never ask for a password, PIN or one-time password.
+            We will confirm that the request has been recorded and state the
+            paid-access end date.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            4. Effective date and future charges
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            No cancellation fee is charged by Lovinara. To prevent the next
+            scheduled automatic payment, cancellation must be received before
+            that payment is processed. If a valid request arrives before the
+            charge, an internal handling delay must not be used as a reason to
+            charge the next renewal.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            After cancellation of automatic renewal, Lovinara will not initiate
+            future Lovinara-controlled recurring payments for that membership. A
+            payment already processed is reviewed separately under the Refund
+            Policy and applicable consumer rights.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            6. Upgrades, downgrades and renewals
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            A member who changes between Basic and Premium or renews manually
+            must be shown the price, effective date, any treatment of remaining
+            paid time, and what features become available before confirming the
+            change. We will not assume that an upgrade automatically converts a
+            manual subscription into recurring billing.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            If payment fails and no new payment is successfully authorised,
+            renewal and paid access cannot be assumed to continue; the account
+            may revert to Free at the end of the paid term.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            7. Trials, promotions and changes in price
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            If Lovinara introduces a free trial or promotional offer, its
+            duration, any future charge and how to cancel must be clearly
+            explained before a member accepts it. No trial is represented by this
+            policy as currently available.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            If a recurring plan price changes, members will receive the
+            information and an opportunity to cancel before the revised charge,
+            and fresh consent will be obtained where the law or payment-provider
+            rules require it.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            4. Effective date and future charges
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            No cancellation fee is charged by Lovinara. To prevent the next
+            scheduled automatic payment, cancellation must be received before
+            that payment is processed. If a valid request arrives before the
+            charge, an internal handling delay must not be used as a reason to
+            charge the next renewal.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            After cancellation of automatic renewal, Lovinara will not initiate
+            future Lovinara-controlled recurring payments for that membership. A
+            payment already processed is reviewed separately under the Refund
+            Policy and applicable consumer rights.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            5. Paid access after cancellation
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            Ordinarily, cancelling a future renewal does not immediately
+            terminate paid access. Members retain the features of the already
+            paid Basic or Premium plan until the end of the paid period, subject
+            to lawful and properly disclosed safety or account restrictions.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            When the paid period expires without a new payment, the account can
+            return to the Free plan, currently described as allowing messages to
+            up to two different people. The unused part of a paid period is not
+            automatically refundable, except as required by law or under the
+            Refund Policy.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            6. Upgrades, downgrades and renewals
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            A member who changes between Basic and Premium or renews manually
+            must be shown the price, effective date, any treatment of remaining
+            paid time, and what features become available before confirming the
+            change. We will not assume that an upgrade automatically converts a
+            manual subscription into recurring billing.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            If payment fails and no new payment is successfully authorised,
+            renewal and paid access cannot be assumed to continue; the account
+            may revert to Free at the end of the paid term.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            4. Effective date and future charges
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            No cancellation fee is charged by Lovinara. To prevent the next
+            scheduled automatic payment, cancellation must be received before
+            that payment is processed. If a valid request arrives before the
+            charge, an internal handling delay must not be used as a reason to
+            charge the next renewal.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            After cancellation of automatic renewal, Lovinara will not initiate
+            future Lovinara-controlled recurring payments for that membership. A
+            payment already processed is reviewed separately under the Refund
+            Policy and applicable consumer rights.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            5. Paid access after cancellation
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            Ordinarily, cancelling a future renewal does not immediately
+            terminate paid access. Members retain the features of the already
+            paid Basic or Premium plan until the end of the paid period, subject
+            to lawful and properly disclosed safety or account restrictions.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            When the paid period expires without a new payment, the account can
+            return to the Free plan, currently described as allowing messages to
+            up to two different people. The unused part of a paid period is not
+            automatically refundable, except as required by law or under the
+            Refund Policy.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            6. Upgrades, downgrades and renewals
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            A member who changes between Basic and Premium or renews manually
+            must be shown the price, effective date, any treatment of remaining
+            paid time, and what features become available before confirming the
+            change. We will not assume that an upgrade automatically converts a
+            manual subscription into recurring billing.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            If payment fails and no new payment is successfully authorised,
+            renewal and paid access cannot be assumed to continue; the account
+            may revert to Free at the end of the paid term.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            4. Effective date and future charges
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            No cancellation fee is charged by Lovinara. To prevent the next
+            scheduled automatic payment, cancellation must be received before
+            that payment is processed. If a valid request arrives before the
+            charge, an internal handling delay must not be used as a reason to
+            charge the next renewal.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            After cancellation of automatic renewal, Lovinara will not initiate
+            future Lovinara-controlled recurring payments for that membership. A
+            payment already processed is reviewed separately under the Refund
+            Policy and applicable consumer rights.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            5. Paid access after cancellation
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            Ordinarily, cancelling a future renewal does not immediately
+            terminate paid access. Members retain the features of the already
+            paid Basic or Premium plan until the end of the paid period, subject
+            to lawful and properly disclosed safety or account restrictions.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            When the paid period expires without a new payment, the account can
+            return to the Free plan, currently described as allowing messages to
+            up to two different people. The unused part of a paid period is not
+            automatically refundable, except as required by law or under the
+            Refund Policy.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            6. Upgrades, downgrades and renewals
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            A member who changes between Basic and Premium or renews manually
+            must be shown the price, effective date, any treatment of remaining
+            paid time, and what features become available before confirming the
+            change. We will not assume that an upgrade automatically converts a
+            manual subscription into recurring billing.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            If payment fails and no new payment is successfully authorised,
+            renewal and paid access cannot be assumed to continue; the account
+            may revert to Free at the end of the paid term.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            7. Trials, promotions and changes in price
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            If Lovinara introduces a free trial or promotional offer, its
+            duration, any future charge and how to cancel must be clearly
+            explained before a member accepts it. No trial is represented by this
+            policy as currently available.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            If a recurring plan price changes, members will receive the
+            information and an opportunity to cancel before the revised charge,
+            and fresh consent will be obtained where the law or payment-provider
+            rules require it.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            9. Refunds, statutory rights and account suspensions
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            Cancelling a future subscription charge and cancelling an electronic
+            purchase for a statutory refund are distinct processes. Refer to the
+            Refund Policy or email support@lovinara.com about the original
+            transaction.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            Nothing here limits consumer rights under the Electronic Transactions
+            Act, 2011 or other applicable law. An account suspended for Community
+            Guidelines or safety violations does not automatically eliminate any
+            mandatory refund right.
+          </p>
+        </article>
+        <article className="rounded-2xl bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-base font-semibold">
+            10. Contact and policy updates
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            Business operator: Lovinara Meeting Point (registered business name,
+            Uganda). Address: Mbogo Zone 1, Kawempe I, Kawempe Division, Kampala
+            Central, Uganda. Cancellation support: support@lovinara.com.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            Related pages: https://lovinara.com/pricing | https://lovinara.com/privacy |
+            https://lovinara.com/guidelines.
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            Material revisions will have a new effective date and any notice
+            required by law.
+          </p>
+        </article>
+
+export default function CancellationAndPrivacyPage(): React.JSX.Element {
+  return (
+    <div className="bg-[#f7f9fb] font-body text-[#191c1e]">
+      <PageHero
+        image="/editorial-3 (1).jpg"
+        eyebrow="Cancellation and privacy"
+        title="Stay in control,"
+        accent="of your account and your data."
+        copy="This page explains how to cancel Premium, how refunds are handled, and how we protect your personal information. It does not replace the Lovinara Terms of Service or Privacy Policy."
+      >
+        <Link
+          to="/contact"
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#8c0026] to-[#b80035] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+        >
+          Contact us <ArrowRight size={16} />
+        </Link>
+      </PageHero>
+      <CancellationAndPrivacySection />
+    </div>
+  );
+}
